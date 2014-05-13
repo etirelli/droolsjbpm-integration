@@ -1,0 +1,105 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+	<modelVersion>4.0.0</modelVersion>
+	<parent>
+		<groupId>org.kie</groupId>
+		<artifactId>kie-parent-with-dependencies</artifactId>
+		<version>6.1.0-SNAPSHOT</version>
+	</parent>
+
+	<artifactId>kie-server</artifactId>
+	<packaging>bundle</packaging>
+
+	<name>KIE :: Execution Server</name>
+	<description>KIE Execution Server</description>
+
+	<dependencies>
+		<!-- core dependencies -->
+		<dependency>
+			<groupId>org.kie</groupId>
+			<artifactId>kie-api</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>org.drools</groupId>
+			<artifactId>drools-compiler</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>org.kie</groupId>
+			<artifactId>kie-ci</artifactId>
+		</dependency>
+
+		<!-- CXF dependencies -->
+		<dependency>
+			<groupId>org.apache.cxf</groupId>
+			<!-- TODO JBRULES-3026 use cxf-rt-frontend-jaxrs and cxf-rt-transports-http-jetty 
+				instead -->
+			<artifactId>cxf-bundle-jaxrs</artifactId>
+			<exclusions>
+				<exclusion>
+					<groupId>xerces</groupId>
+					<artifactId>xercesImpl</artifactId>
+				</exclusion>
+				<exclusion>
+					<groupId>xerces</groupId>
+					<artifactId>xmlParserAPIs</artifactId>
+				</exclusion>
+				<exclusion>
+					<groupId>xml-apis</groupId>
+					<artifactId>xml-apis</artifactId>
+				</exclusion>
+				<exclusion>
+					<groupId>org.apache.geronimo.specs</groupId>
+					<artifactId>geronimo-servlet_2.5_spec</artifactId>
+				</exclusion>
+				<exclusion>
+					<groupId>jaxen</groupId>
+					<artifactId>jaxen</artifactId>
+				</exclusion>
+				<exclusion>
+					<groupId>org.apache.xmlbeans</groupId>
+					<artifactId>xmlbeans</artifactId>
+				</exclusion>
+			</exclusions>
+		</dependency>
+	</dependencies>
+	
+	<build>
+		<plugins>
+			<plugin>
+				<!-- we need to fork always as we have mixture of both arquillian tests 
+					and regular and to avoid clashing between them as both need to setup data 
+					source and bound it to JNDI -->
+				<artifactId>maven-surefire-plugin</artifactId>
+				<configuration>
+					<forkMode>always</forkMode>
+				</configuration>
+			</plugin>
+
+			<plugin>
+				<groupId>org.apache.felix</groupId>
+				<artifactId>maven-bundle-plugin</artifactId>
+				<configuration>
+					<instructions>
+						<Bundle-SymbolicName>org.kie.server</Bundle-SymbolicName>
+						<Import-Package>
+							<!-- org.kie.api.*,
+							org.kie.api.builder.*,
+							org.drools.compiler.kproject.*,
+							org.sonatype.aether.artifact;resolution:=optional,
+							org.kie.scanner;resolution:=optional,
+							org.jboss.solder.core;resolution:=optional,
+							org.jbpm.services.task.audit;resolution:=optional, -->
+							*
+						</Import-Package>
+						<Private-Package></Private-Package>
+						<Export-Package>
+							org.kie.server.*,
+							org.kie.server.api.*,
+							org.kie.server.impl.*
+						</Export-Package>
+					</instructions>
+				</configuration>
+			</plugin>
+		</plugins>
+	</build>
+</project>
