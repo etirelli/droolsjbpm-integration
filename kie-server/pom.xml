@@ -8,7 +8,7 @@
 	</parent>
 
 	<artifactId>kie-server</artifactId>
-	<packaging>bundle</packaging>
+	<packaging>war</packaging>
 
 	<name>KIE :: Execution Server</name>
 	<description>KIE Execution Server</description>
@@ -31,38 +31,55 @@
 		<!-- CXF dependencies -->
 		<dependency>
 			<groupId>org.apache.cxf</groupId>
-			<!-- TODO JBRULES-3026 use cxf-rt-frontend-jaxrs and cxf-rt-transports-http-jetty 
-				instead -->
-			<artifactId>cxf-bundle-jaxrs</artifactId>
-			<exclusions>
-				<exclusion>
-					<groupId>xerces</groupId>
-					<artifactId>xercesImpl</artifactId>
-				</exclusion>
-				<exclusion>
-					<groupId>xerces</groupId>
-					<artifactId>xmlParserAPIs</artifactId>
-				</exclusion>
-				<exclusion>
-					<groupId>xml-apis</groupId>
-					<artifactId>xml-apis</artifactId>
-				</exclusion>
-				<exclusion>
-					<groupId>org.apache.geronimo.specs</groupId>
-					<artifactId>geronimo-servlet_2.5_spec</artifactId>
-				</exclusion>
-				<exclusion>
-					<groupId>jaxen</groupId>
-					<artifactId>jaxen</artifactId>
-				</exclusion>
-				<exclusion>
-					<groupId>org.apache.xmlbeans</groupId>
-					<artifactId>xmlbeans</artifactId>
-				</exclusion>
-			</exclusions>
+			<artifactId>cxf-rt-frontend-jaxws</artifactId>
+			<version>2.7.11</version>
+		</dependency>
+		<dependency>
+			<groupId>org.apache.cxf</groupId>
+			<artifactId>cxf-rt-transports-http</artifactId>
+			<version>2.7.11</version>
+		</dependency>
+		<dependency>
+			<groupId>org.apache.cxf</groupId>
+			<artifactId>cxf-rt-transports-http-jetty</artifactId>
+			<version>2.7.11</version>
+		</dependency>
+
+		<dependency>
+			<groupId>org.springframework</groupId>
+			<artifactId>spring-context</artifactId>
+			<version>3.0.7.RELEASE</version>
+		</dependency>
+		<dependency>
+			<groupId>org.springframework</groupId>
+			<artifactId>spring-web</artifactId>
+			<version>3.0.7.RELEASE</version>
+		</dependency>
+		<dependency>
+			<groupId>org.eclipse.jetty</groupId>
+			<artifactId>jetty-webapp</artifactId>
+			<version>8.1.14.v20131031</version>
+		</dependency>
+		<dependency>
+			<groupId>commons-collections</groupId>
+			<artifactId>commons-collections</artifactId>
+		</dependency>
+
+		<!-- log -->
+		<dependency>
+			<groupId>org.slf4j</groupId>
+			<artifactId>slf4j-api</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>org.slf4j</groupId>
+			<artifactId>slf4j-simple</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>ch.qos.logback</groupId>
+			<artifactId>logback-classic</artifactId>
 		</dependency>
 	</dependencies>
-	
+
 	<build>
 		<plugins>
 			<plugin>
@@ -76,28 +93,21 @@
 			</plugin>
 
 			<plugin>
-				<groupId>org.apache.felix</groupId>
-				<artifactId>maven-bundle-plugin</artifactId>
+				<artifactId>maven-war-plugin</artifactId>
+				<version>2.1</version>
 				<configuration>
-					<instructions>
-						<Bundle-SymbolicName>org.kie.server</Bundle-SymbolicName>
-						<Import-Package>
-							<!-- org.kie.api.*,
-							org.kie.api.builder.*,
-							org.drools.compiler.kproject.*,
-							org.sonatype.aether.artifact;resolution:=optional,
-							org.kie.scanner;resolution:=optional,
-							org.jboss.solder.core;resolution:=optional,
-							org.jbpm.services.task.audit;resolution:=optional, -->
-							*
-						</Import-Package>
-						<Private-Package></Private-Package>
-						<Export-Package>
-							org.kie.server.*,
-							org.kie.server.api.*,
-							org.kie.server.impl.*
-						</Export-Package>
-					</instructions>
+					<webXml>src/main/webapp/WEB-INF/web.xml</webXml>
+				</configuration>
+			</plugin>
+
+			<plugin>
+				<groupId>io.fabric8</groupId>
+				<artifactId>fabric8-maven-plugin</artifactId>
+				<configuration>
+					<profile>kie-server</profile>
+					<features>fabric-cxf-registry fabric-cxf cxf</features>
+					<featureRepos>mvn:org.apache.cxf.karaf/apache-cxf/${version:cxf}/xml/features</featureRepos>
+					<parentProfiles>containers-java.camel.spring</parentProfiles>
 				</configuration>
 			</plugin>
 		</plugins>
