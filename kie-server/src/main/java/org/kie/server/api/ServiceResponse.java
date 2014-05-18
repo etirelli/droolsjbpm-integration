@@ -5,8 +5,11 @@ public class ServiceResponse {
         SUCCESS, FAILURE;
     }
     
-    private final ServiceResponse.ResponseType type;
-    private final String msg;
+    private ServiceResponse.ResponseType type;
+    private String msg;
+    
+    public ServiceResponse() {
+    }
     
     public ServiceResponse(ServiceResponse.ResponseType type, String msg) {
         super();
@@ -20,6 +23,14 @@ public class ServiceResponse {
     
     public String getMsg() {
         return msg;
+    }
+    
+    public void setType(ServiceResponse.ResponseType type) {
+        this.type = type;
+    }
+
+    public void setMsg(String msg) {
+        this.msg = msg;
     }
 
     @Override

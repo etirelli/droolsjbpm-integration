@@ -1,25 +1,21 @@
 package org.kie.server.impl;
 
-import javax.xml.ws.Endpoint;
+import java.util.List;
 
+import org.kie.api.builder.ReleaseId;
+import org.kie.server.api.KieServer;
+import org.springframework.context.support.ClassPathXmlApplicationContext;
 
 public class KieServerMain {
-    
-    protected KieServerMain() throws Exception {
-        // START SNIPPET: publish
-        System.out.println("Starting Server");
-        KieServerImpl implementor = new KieServerImpl();
-        String address = "http://localhost:9000/KieServer";
-        Endpoint.publish(address, implementor);
-        // END SNIPPET: publish
-    }
 
     public static void main(String args[]) throws Exception {
-        new KieServerMain();
-        System.out.println("Server ready...");
+        ClassPathXmlApplicationContext context = new ClassPathXmlApplicationContext(new String[]{"client-beans.xml"});
 
-        Thread.sleep(10 * 60 * 1000);
-        System.out.println("Server exiting");
+        KieServer client = (KieServer) context.getBean("client");
+
+        List<ReleaseId> response = client.getModules();
+        System.out.println("Response: " + response);
         System.exit(0);
     }
+
 }
