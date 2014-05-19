@@ -51,6 +51,20 @@
       <scope>provided</scope>
 		</dependency>
 
+    <!-- avoid some old versions from transitive dependencies -->
+		<dependency>
+			<groupId>org.apache.cxf</groupId>
+			<artifactId>cxf-rt-bindings-soap</artifactId>
+			<version>2.7.11</version>
+      <scope>provided</scope>
+		</dependency>
+		<dependency>
+			<groupId>org.apache.cxf</groupId>
+			<artifactId>cxf-rt-databinding-jaxb</artifactId>
+			<version>2.7.11</version>
+      <scope>provided</scope>
+		</dependency>
+
 		<dependency>
 			<groupId>org.springframework</groupId>
 			<artifactId>spring-context</artifactId>
@@ -119,14 +133,29 @@
         <version>1.1.0-SNAPSHOT</version>
 				<configuration>
 					<profile>kieserver</profile>
+
+          <!-- lets run the war in a tomcat container -->
+          <parentProfiles>containers-tomcat</parentProfiles>
 <!--
-					<features>fabric-cxf-registry fabric-cxf cxf</features>
-					<featureRepos>mvn:org.apache.cxf.karaf/apache-cxf/${version:cxf}/xml/features</featureRepos>
+          This option lets us run a static main() using spring and camel:
+
 					<parentProfiles>containers-java.camel.spring</parentProfiles>
 -->
-					<parentProfiles>containers-tomcat</parentProfiles>
 				</configuration>
 			</plugin>
+
+      <!-- allow the war to be run via: mvn jetty:run -->
+      <plugin>
+        <groupId>org.mortbay.jetty</groupId>
+        <artifactId>jetty-maven-plugin</artifactId>
+        <version>7.6.9.v20130131</version>
+        <configuration>
+          <webAppConfig>
+            <contextPath>/kieserver</contextPath>
+          </webAppConfig>
+          <useProvidedScope>true</useProvidedScope>
+        </configuration>
+      </plugin>
 		</plugins>
 	</build>
 </project>
