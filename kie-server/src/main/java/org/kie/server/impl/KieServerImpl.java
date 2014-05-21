@@ -5,15 +5,17 @@ import java.util.List;
 
 import javax.jws.WebService;
 
+import org.kie.api.builder.ReleaseId;
 import org.kie.server.api.KieServer;
+import org.kie.server.api.ServiceResponse;
 
 @WebService(endpointInterface="org.kie.server.api.KieServer", serviceName="KieServer")
 public class KieServerImpl implements KieServer {
 
     @Override
-    public String deployModule(String releaseId) {
+    public ServiceResponse deployModule(ReleaseId releaseId) {
         System.out.println(">>> deploy "+releaseId);
-        return "SUCCESS"; //new ServiceResponse(ServiceResponse.ResponseType.SUCCESS, "KJar "+releaseId+" successfully deployed.");
+        return new ServiceResponse(ServiceResponse.ResponseType.SUCCESS, "KJar "+releaseId+" successfully deployed.");
     }
 
     @Override
@@ -23,9 +25,9 @@ public class KieServerImpl implements KieServer {
     }
 
     @Override
-    public String undeployModule(String releaseId) {
+    public ServiceResponse undeployModule(String releaseId) {
         System.out.println("--- undeploy "+releaseId);
-        return "SUCCESS"; //new ServiceResponse(ServiceResponse.ResponseType.SUCCESS, "KJar "+releaseId+" successfully undeployed.");
+        return new ServiceResponse(ServiceResponse.ResponseType.SUCCESS, "KJar "+releaseId+" successfully undeployed.");
     }
 
 }
