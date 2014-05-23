@@ -1,5 +1,7 @@
 package org.kie.server.impl;
 
+import javax.xml.bind.annotation.XmlElement;
+
 import org.kie.api.builder.ReleaseId;
 
 /**
@@ -23,6 +25,7 @@ public class KSReleaseIdImpl implements ReleaseId {
         this.version = version;
     }
 
+    @XmlElement(required = true)
     public String getGroupId() {
         return groupId;
     }
@@ -31,6 +34,7 @@ public class KSReleaseIdImpl implements ReleaseId {
         this.groupId = groupId;
     }
 
+    @XmlElement(required = true)
     public String getArtifactId() {
         return artifactId;
     }
@@ -39,6 +43,7 @@ public class KSReleaseIdImpl implements ReleaseId {
         this.artifactId = artifactId;
     }
 
+    @XmlElement(required = true)
     public String getVersion() {
         return version;
     }
