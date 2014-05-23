@@ -1,6 +1,6 @@
 package org.kie.server.api;
 
-import java.util.List;
+import java.util.Collection;
 
 import javax.jws.WebParam;
 import javax.jws.WebParam.Mode;
@@ -11,10 +11,11 @@ import org.kie.api.builder.ReleaseId;
 @WebService
 public interface KieServer {
     
-    public ServiceResponse deployModule( @WebParam(name="releaseId", mode=Mode.IN) ReleaseId releasedId );
+    public ServiceResponse deployModule( @WebParam(name="containerId", mode=Mode.IN) String containerId, 
+                                          @WebParam(name="releaseId", mode=Mode.IN) ReleaseId releasedId );
     
-    public List<String> getModules();
+    public Collection<KieContainerInfo> getModules();
     
-    public ServiceResponse undeployModule( @WebParam(name="deploymentId", mode=Mode.IN) String deploymentId );
+    public ServiceResponse undeployModule( @WebParam(name="containerId", mode=Mode.IN) String containerId );
 
-}
+} 
