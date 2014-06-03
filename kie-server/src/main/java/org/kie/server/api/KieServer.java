@@ -1,21 +1,19 @@
 package org.kie.server.api;
 
-import java.util.Collection;
+import javax.ws.rs.Consumes;
+import javax.ws.rs.POST;
+import javax.ws.rs.Path;
+import javax.ws.rs.Produces;
 
-import javax.jws.WebParam;
-import javax.jws.WebParam.Mode;
-import javax.jws.WebService;
+import org.drools.core.command.impl.GenericCommand;
 
-import org.kie.api.builder.ReleaseId;
-
-@WebService
+@Path("/server")
 public interface KieServer {
     
-    public ServiceResponse deployModule( @WebParam(name="containerId", mode=Mode.IN) String containerId, 
-                                          @WebParam(name="releaseId", mode=Mode.IN) ReleaseId releasedId );
+    @POST
+    @Path("execute")
+    @Consumes("application/xml")
+    @Produces("application/xml")
+    public <T> T execute( GenericCommand<T> command );
     
-    public Collection<KieContainerInfo> getModules();
-    
-    public ServiceResponse undeployModule( @WebParam(name="containerId", mode=Mode.IN) String containerId );
-
 } 

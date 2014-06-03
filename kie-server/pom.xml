@@ -13,6 +13,23 @@
 	<name>KIE :: Execution Server</name>
 	<description>KIE Execution Server</description>
 
+	<dependencyManagement>
+		<dependencies>
+			<dependency>
+				<groupId>org.eclipse.jetty</groupId>
+				<artifactId>jetty-webapp</artifactId>
+				<version>8.1.14.v20131031</version>
+				<scope>test</scope>
+			</dependency>
+			<dependency>
+				<groupId>org.apache.cxf</groupId>
+				<artifactId>cxf-rt-management</artifactId>
+				<version>2.7.11</version>
+				<!-- scope>provided</scope -->
+			</dependency>
+		</dependencies>
+	</dependencyManagement>
+
 	<dependencies>
 		<!-- core dependencies -->
 		<dependency>
@@ -30,18 +47,28 @@
 			<artifactId>kie-ci</artifactId>
 			<!-- scope>provided</scope -->
 		</dependency>
+		<dependency>
+			<groupId>org.kie</groupId>
+			<artifactId>kie-camel</artifactId>
+			<!-- scope>provided</scope -->
+		</dependency>
 
 		<!-- CXF dependencies -->
 		<dependency>
 			<groupId>org.apache.cxf</groupId>
 			<artifactId>cxf-rt-frontend-jaxws</artifactId>
-			<version>2.7.11</version>
+			<!-- version>2.7.11</version -->
 			<!-- scope>provided</scope -->
 		</dependency>
 		<dependency>
 			<groupId>org.apache.cxf</groupId>
+			<artifactId>cxf-rt-frontend-jaxrs</artifactId>
+			<!-- version>2.7.11</version -->
+		</dependency>
+		<dependency>
+			<groupId>org.apache.cxf</groupId>
 			<artifactId>cxf-rt-transports-http</artifactId>
-			<version>2.7.11</version>
+			<!-- version>2.7.11</version -->
 			<!-- scope>provided</scope -->
 		</dependency>
 
@@ -49,7 +76,7 @@
 		<dependency>
 			<groupId>org.apache.cxf</groupId>
 			<artifactId>cxf-rt-management</artifactId>
-			<version>2.7.11</version>
+			<!-- version>2.7.11</version -->
 			<!-- scope>provided</scope -->
 		</dependency>
 
@@ -57,26 +84,26 @@
 		<dependency>
 			<groupId>org.apache.cxf</groupId>
 			<artifactId>cxf-rt-bindings-soap</artifactId>
-			<version>2.7.11</version>
+			<!-- version>2.7.11</version -->
 			<!-- scope>provided</scope -->
 		</dependency>
 		<dependency>
 			<groupId>org.apache.cxf</groupId>
 			<artifactId>cxf-rt-databinding-jaxb</artifactId>
-			<version>2.7.11</version>
+			<!-- version>2.7.11</version -->
 			<!-- scope>provided</scope -->
 		</dependency>
 
 		<dependency>
 			<groupId>org.springframework</groupId>
 			<artifactId>spring-context</artifactId>
-			<version>3.0.7.RELEASE</version>
+			<!-- version>3.0.7.RELEASE</version -->
 			<!-- scope>provided</scope -->
 		</dependency>
 		<dependency>
 			<groupId>org.springframework</groupId>
 			<artifactId>spring-web</artifactId>
-			<version>3.0.7.RELEASE</version>
+			<!-- version>3.0.7.RELEASE</version -->
 			<!-- scope>provided</scope -->
 		</dependency>
 		<dependency>
@@ -97,17 +124,17 @@
 			<!-- scope>provided</scope -->
 		</dependency>
 
-        <!-- test dependencies -->
+		<!-- test dependencies -->
 		<dependency>
 			<groupId>org.eclipse.jetty</groupId>
 			<artifactId>jetty-webapp</artifactId>
-			<version>8.1.14.v20131031</version>
+			<!-- version>8.1.14.v20131031</version -->
 			<scope>test</scope>
 		</dependency>
 		<dependency>
 			<groupId>org.apache.cxf</groupId>
 			<artifactId>cxf-rt-transports-http-jetty</artifactId>
-			<version>2.7.11</version>
+			<!-- version>2.7.11</version -->
 			<scope>test</scope>
 		</dependency>
 
@@ -133,19 +160,9 @@
 				</configuration>
 			</plugin>
 
-			<plugin>
-				<groupId>io.fabric8</groupId>
-				<artifactId>fabric8-maven-plugin</artifactId>
-				<!-- version>1.1.0-SNAPSHOT</version -->
-				<configuration>
-					<profile>kieserver</profile>
-
-					<!-- lets run the war in a tomcat container -->
-					<parentProfiles>containers-tomcat</parentProfiles>
-					<!-- This option lets us run a static main() using spring and camel: 
-						<parentProfiles>containers-java.camel.spring</parentProfiles> -->
-				</configuration>
-			</plugin>
+			<!-- plugin> <groupId>io.fabric8</groupId> <artifactId>fabric8-maven-plugin</artifactId> 
+				<configuration> <profile>kieserver</profile> <parentProfiles>containers-tomcat</parentProfiles> 
+				</configuration> </plugin -->
 		</plugins>
 	</build>
 </project>

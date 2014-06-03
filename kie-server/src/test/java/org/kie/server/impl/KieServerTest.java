@@ -18,7 +18,9 @@ import org.kie.api.builder.ReleaseId;
 import org.kie.scanner.MavenRepository;
 import org.kie.server.api.KieServer;
 import org.kie.server.api.ServiceResponse;
+import org.kie.server.command.DeployModuleCommand;
 
+@Ignore
 public class KieServerTest {
 
     private static final String ADDRESS = "http://localhost:9000/KieServer";
@@ -63,19 +65,8 @@ public class KieServerTest {
         factory.setAddress(ADDRESS);
         KieServer client = (KieServer) factory.create();
 
-        ServiceResponse reply = client.deployModule("kie1", releaseId);
+        ServiceResponse reply = client.execute(new DeployModuleCommand("kie1", releaseId));
         System.out.println(">>>>>>>>>>>>>>>>>>>>>>>>>>> " + reply);
-        Assert.assertEquals(ServiceResponse.ResponseType.SUCCESS, reply.getType());
-    }
-
-    @Test @Ignore
-    public void testUndeployModule() {
-        JaxWsProxyFactoryBean factory = new JaxWsProxyFactoryBean();
-        factory.setServiceClass(KieServer.class);
-        factory.setAddress(ADDRESS);
-        KieServer client = (KieServer) factory.create();
-
-        ServiceResponse reply = client.undeployModule("kie1");
         Assert.assertEquals(ServiceResponse.ResponseType.SUCCESS, reply.getType());
     }
 
