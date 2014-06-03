@@ -1,0 +1,33 @@
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:cxf="http://camel.apache.org/schema/cxf"
+       xmlns:jaxrs="http://cxf.apache.org/jaxrs"
+       xsi:schemaLocation="
+       http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-2.5.xsd
+       http://camel.apache.org/schema/cxf http://camel.apache.org/schema/cxf/camel-cxf.xsd
+       http://cxf.apache.org/jaxrs http://cxf.apache.org/schemas/jaxrs.xsd
+       http://camel.apache.org/schema/spring http://camel.apache.org/schema/spring/camel-spring.xsd
+    ">
+
+	<import resource="classpath:META-INF/cxf/cxf.xml" />
+	<import resource="classpath:META-INF/cxf/cxf-servlet.xml" />
+
+	<cxf:rsServer id="rsServer" address="/rest"
+		serviceClass="org.kie.jax.rs.CommandExecutorImpl">
+		<!-- cxf:providers>
+			<bean class="org.kie.jax.rs.CommandMessageBodyReader" />
+		</cxf:providers -->
+	</cxf:rsServer>
+
+	<bean id="kieServer" class="org.kie.server.impl.KieServerImpl" />
+
+	<camelContext id="camel" xmlns="http://camel.apache.org/schema/spring">
+		<route>
+			<from uri="cxfrs://bean://rsServer" />
+	        <to uri="direct:kieServer" />
+			<!-- to uri="log:TEST?showAll=true" / -->
+		</route>
+	</camelContext>
+
+</beans>
+

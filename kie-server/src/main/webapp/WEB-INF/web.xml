@@ -3,6 +3,17 @@
 	version="2.5"
 	xsi:schemaLocation="http://java.sun.com/xml/ns/javaee           http://java.sun.com/xml/ns/javaee/web-app_2_5.xsd">
 
+	<!-- location of spring xml files -->
+	<context-param>
+		<param-name>contextConfigLocation</param-name>
+        <param-value>classpath:camel-cxf-server.xml</param-value>
+	</context-param>
+
+	<!-- the listener that kick-starts Spring -->
+	<listener>
+		<listener-class>org.springframework.web.context.ContextLoaderListener</listener-class>
+	</listener>
+
 	<display-name>KIE :: Execution Server</display-name>
 	<servlet>
 		<description>Kie Server Endpoint</description>
