@@ -4,8 +4,9 @@ import javax.ws.rs.Consumes;
 import javax.ws.rs.POST;
 import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
+import javax.ws.rs.core.Response;
 
-import org.drools.core.command.impl.GenericCommand;
+import org.kie.server.api.command.BatchExecutionCommand;
 
 @Path("/server")
 public interface KieServer {
@@ -14,6 +15,6 @@ public interface KieServer {
     @Path("execute")
     @Consumes("application/xml")
     @Produces("application/xml")
-    public <T> T execute( GenericCommand<T> command );
+    public <T> Response execute( BatchExecutionCommand command );
     
 } 

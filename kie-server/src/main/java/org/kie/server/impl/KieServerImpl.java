@@ -3,28 +3,39 @@ package org.kie.server.impl;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
-import javax.jws.WebService;
+import javax.ws.rs.core.Response;
 
-import org.drools.core.command.impl.GenericCommand;
-import org.kie.api.command.Command;
-import org.kie.api.runtime.CommandExecutor;
 import org.kie.server.api.KieContainerInfo;
+import org.kie.server.api.KieServer;
+import org.kie.server.api.command.BatchExecutionCommand;
+import org.kie.server.api.command.KieServerCommandContext;
 
-//@WebService(endpointInterface="org.kie.server.api.KieServer", serviceName="KieServer")
-public class KieServerImpl implements CommandExecutor {
-    private final Map<String, KieContainerInfo> containers = new ConcurrentHashMap<String, KieContainerInfo>();
+public class KieServerImpl implements KieServer {
 
-//    @POST
-//    @Path("/execute")
-//    @Produces({"application/xml","application/json"})
-//    @Consumes({"application/xml","application/json","application/x-www-form-urlencoded"})
-//    public <T> T execute(GenericCommand<T> command) {
-//        return ;
-//    }
+    private final Map<String, KieContainerInfo> containers;
+    private final KieServerCommandContext   context;
 
-    @Override
-    public <T> T execute(Command<T> command) {
-        return ((GenericCommand<T>)command).execute(null);
+    public KieServerImpl() {
+        this.containers = new ConcurrentHashMap<String, KieContainerInfo>();
+        this.context = new KieServerCommandContextImpl(containers);
     }
 
+    @Override
+    public <T> Response execute(BatchExecutionCommand command) {
+        return Response.ok(command.execute(context)).build();
+    }
+
+    public static class KieServerCommandContextImpl implements KieServerCommandContext {
+
+        private final Map<String, KieContainerInfo> containers;
+
+        public KieServerCommandContextImpl(Map<String, KieContainerInfo> containers) {
+            this.containers = containers;
+        }
+
+        @Override
+        public Map<String, KieContainerInfo> getContainers() {
+            return containers;
+        }
+    }
 }

@@ -1,11 +1,20 @@
-package org.kie.server.api;
+package org.kie.server.api.command;
 
+import javax.xml.bind.annotation.XmlAccessType;
+import javax.xml.bind.annotation.XmlAccessorType;
+import javax.xml.bind.annotation.XmlAttribute;
+import javax.xml.bind.annotation.XmlRootElement;
+
+@XmlRootElement(name="response")
+@XmlAccessorType(XmlAccessType.NONE)
 public class ServiceResponse {
     public static enum ResponseType {
         SUCCESS, FAILURE;
     }
     
+    @XmlAttribute
     private ServiceResponse.ResponseType type;
+    @XmlAttribute
     private String msg;
     
     public ServiceResponse() {
