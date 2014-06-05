@@ -18,7 +18,7 @@ import org.kie.api.builder.ReleaseId;
 import org.kie.scanner.MavenRepository;
 import org.kie.server.api.KieServer;
 import org.kie.server.api.command.ServiceResponse;
-import org.kie.server.api.command.impl.DeployModuleCommand;
+import org.kie.server.api.command.impl.CreateContainerCommand;
 
 @Ignore
 public class KieServerTest {

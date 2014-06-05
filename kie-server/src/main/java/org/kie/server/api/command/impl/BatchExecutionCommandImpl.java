@@ -46,8 +46,9 @@ public class BatchExecutionCommandImpl implements BatchExecutionCommand {
     private String            lookup;
 
     @XmlElements({
-        @XmlElement(name = "deploy-module", type = DeployModuleCommand.class),
-        @XmlElement(name = "list-containers", type = ListContainersCommand.class)
+        @XmlElement(name = "create-container", type = CreateContainerCommand.class),
+        @XmlElement(name = "list-containers", type = ListContainersCommand.class),
+        @XmlElement(name = "dispose-container", type = DisposeContainerCommand.class)
     })
     protected List<KieServerCommand> commands;
 

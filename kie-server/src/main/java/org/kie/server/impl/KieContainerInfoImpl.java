@@ -2,6 +2,7 @@ package org.kie.server.impl;
 
 import javax.xml.bind.annotation.XmlTransient;
 
+import org.drools.compiler.kie.builder.impl.InternalKieContainer;
 import org.kie.api.runtime.KieContainer;
 import org.kie.server.api.KieContainerInfo;
 
@@ -10,7 +11,7 @@ public class KieContainerInfoImpl implements KieContainerInfo {
     private String       containerId;
     private Status       status;
     @XmlTransient
-    private KieContainer kieContainer;
+    private InternalKieContainer kieContainer;
 
     public KieContainerInfoImpl() {
         super();
@@ -20,7 +21,7 @@ public class KieContainerInfoImpl implements KieContainerInfo {
         this( containerId, status, null);
     }
     
-    public KieContainerInfoImpl(String containerId, KieContainerInfo.Status status, KieContainer kieContainer) {
+    public KieContainerInfoImpl(String containerId, KieContainerInfo.Status status, InternalKieContainer kieContainer) {
         super();
         this.containerId = containerId;
         this.status = status;
@@ -40,11 +41,11 @@ public class KieContainerInfoImpl implements KieContainerInfo {
     }
 
     @XmlTransient
-    public KieContainer getKieContainer() {
+    public InternalKieContainer getKieContainer() {
         return kieContainer;
     }
 
-    public void setKieContainer(KieContainer kieContainer) {
+    public void setKieContainer(InternalKieContainer kieContainer) {
         this.kieContainer = kieContainer;
     }
 

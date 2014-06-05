@@ -6,18 +6,18 @@ import javax.xml.bind.annotation.XmlAttribute;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlRootElement;
 
+import org.drools.compiler.kie.builder.impl.InternalKieContainer;
 import org.kie.api.KieServices;
 import org.kie.api.builder.ReleaseId;
-import org.kie.api.runtime.KieContainer;
 import org.kie.server.api.KieContainerInfo;
 import org.kie.server.api.command.KieServerCommand;
 import org.kie.server.api.command.KieServerCommandContext;
 import org.kie.server.api.command.ServiceResponse;
 import org.kie.server.impl.KieContainerInfoImpl;
 
-@XmlRootElement(name="deploy-module")
+@XmlRootElement(name="create-container")
 @XmlAccessorType(XmlAccessType.NONE)
-public class DeployModuleCommand implements KieServerCommand {
+public class CreateContainerCommand implements KieServerCommand {
     private static final long serialVersionUID = -1803374525440238478L;
     
     @XmlAttribute(name="container-id")
@@ -25,11 +25,11 @@ public class DeployModuleCommand implements KieServerCommand {
     @XmlElement(name="release-id")
     private ReleaseId releaseId;
     
-    public DeployModuleCommand() {
+    public CreateContainerCommand() {
         super();
     }
     
-    public DeployModuleCommand(String containerId, ReleaseId releaseId) {
+    public CreateContainerCommand(String containerId, ReleaseId releaseId) {
         this.containerId = containerId;
         this.releaseId = releaseId;
     }
@@ -39,7 +39,7 @@ public class DeployModuleCommand implements KieServerCommand {
         try {
             if( ! context.getContainers().containsKey(containerId) ) {
                 KieServices ks = KieServices.Factory.get();
-                KieContainer kieContainer = ks.newKieContainer(releaseId);
+                InternalKieContainer kieContainer = (InternalKieContainer) ks.newKieContainer(releaseId);
                 if( kieContainer != null ) {
                     context.getContainers().put(containerId, new KieContainerInfoImpl(containerId, KieContainerInfo.Status.STARTED, kieContainer));
                     return new ServiceResponse(ServiceResponse.ResponseType.SUCCESS, "Container "+containerId+" successfully deployed with module "+releaseId+".");
