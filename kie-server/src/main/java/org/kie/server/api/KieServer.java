@@ -15,6 +15,6 @@ public interface KieServer {
     @Path("execute")
     @Consumes("application/xml")
     @Produces("application/xml")
-    public <T> Response execute( BatchExecutionCommand command );
+    public Response execute( BatchExecutionCommand command );
     
 } 

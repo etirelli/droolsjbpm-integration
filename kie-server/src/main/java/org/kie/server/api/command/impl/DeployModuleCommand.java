@@ -17,7 +17,7 @@ import org.kie.server.impl.KieContainerInfoImpl;
 
 @XmlRootElement(name="deploy-module")
 @XmlAccessorType(XmlAccessType.NONE)
-public class DeployModuleCommand implements KieServerCommand<ServiceResponse> {
+public class DeployModuleCommand implements KieServerCommand {
     private static final long serialVersionUID = -1803374525440238478L;
     
     @XmlAttribute(name="container-id")
@@ -36,17 +36,22 @@ public class DeployModuleCommand implements KieServerCommand<ServiceResponse> {
 
     @Override
     public ServiceResponse execute(KieServerCommandContext context) {
-        if( ! context.getContainers().containsKey(containerId) ) {
-            KieServices ks = KieServices.Factory.get();
-            KieContainer kieContainer = ks.newKieContainer(releaseId);
-            if( kieContainer != null ) {
-                context.getContainers().put(containerId, new KieContainerInfoImpl(containerId, KieContainerInfo.Status.STARTED, kieContainer));
-                return new ServiceResponse(ServiceResponse.ResponseType.SUCCESS, "Container "+containerId+" successfully deployed with KJar "+releaseId+".");
+        try {
+            if( ! context.getContainers().containsKey(containerId) ) {
+                KieServices ks = KieServices.Factory.get();
+                KieContainer kieContainer = ks.newKieContainer(releaseId);
+                if( kieContainer != null ) {
+                    context.getContainers().put(containerId, new KieContainerInfoImpl(containerId, KieContainerInfo.Status.STARTED, kieContainer));
+                    return new ServiceResponse(ServiceResponse.ResponseType.SUCCESS, "Container "+containerId+" successfully deployed with module "+releaseId+".");
+                } else {
+                    return new ServiceResponse(ServiceResponse.ResponseType.FAILURE, "Failed to create container "+containerId+" with module "+releaseId+".");
+                }        
             } else {
-                return new ServiceResponse(ServiceResponse.ResponseType.FAILURE, "Failed to create container "+containerId+" with KJar "+releaseId+".");
-            }        
-        } else {
-            return new ServiceResponse(ServiceResponse.ResponseType.FAILURE, "Container "+containerId+" already exists.");
+                return new ServiceResponse(ServiceResponse.ResponseType.FAILURE, "Container "+containerId+" already exists.");
+            }
+        } catch (Exception e) {
+            return new ServiceResponse(ServiceResponse.ResponseType.FAILURE, "Error creating container "+containerId+
+                    " with module "+releaseId+": "+e.getClass().getName()+": "+e.getMessage());
         }
     }
 

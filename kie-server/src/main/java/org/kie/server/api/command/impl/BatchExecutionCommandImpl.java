@@ -45,35 +45,37 @@ public class BatchExecutionCommandImpl implements BatchExecutionCommand {
     @XStreamAsAttribute
     private String            lookup;
 
+    @XmlElements({
+        @XmlElement(name = "deploy-module", type = DeployModuleCommand.class),
+        @XmlElement(name = "list-containers", type = ListContainersCommand.class)
+    })
+    protected List<KieServerCommand> commands;
+
     public BatchExecutionCommandImpl() {
     }
 
-    public BatchExecutionCommandImpl(List<KieServerCommand<?>> commands) {
+    public BatchExecutionCommandImpl(List<KieServerCommand> commands) {
         this.commands = commands;
     }
 
-    public BatchExecutionCommandImpl(List<KieServerCommand<?>> commands, String lookup) {
+    public BatchExecutionCommandImpl(List<KieServerCommand> commands, String lookup) {
         this.commands = commands;
         this.lookup = lookup;
     }
 
-    @XmlElements({
-        @XmlElement(name = "deploy-module", type = DeployModuleCommand.class)
-    })
-    protected List<KieServerCommand<?>> commands;
-
-    public List<KieServerCommand<?>> getCommands() {
+    public List<KieServerCommand> getCommands() {
         if (commands == null) {
-            commands = new ArrayList<KieServerCommand<?>>();
+            commands = new ArrayList<KieServerCommand>();
         }
         return this.commands;
     }
 
     public List<ServiceResponse> execute(KieServerCommandContext context) {
-        for (KieServerCommand<?> command : commands) {
-            command.execute(context);
+        List<ServiceResponse> response = new ArrayList<ServiceResponse>();
+        for (KieServerCommand command : commands) {
+            response.add(command.execute(context));
         }
-        return null;
+        return response;
     }
 
     public void setLookup(String lookup) {

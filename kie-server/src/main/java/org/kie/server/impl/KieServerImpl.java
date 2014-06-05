@@ -1,14 +1,17 @@
 package org.kie.server.impl;
 
+import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
+import javax.ws.rs.core.GenericEntity;
 import javax.ws.rs.core.Response;
 
 import org.kie.server.api.KieContainerInfo;
 import org.kie.server.api.KieServer;
 import org.kie.server.api.command.BatchExecutionCommand;
 import org.kie.server.api.command.KieServerCommandContext;
+import org.kie.server.api.command.ServiceResponse;
 
 public class KieServerImpl implements KieServer {
 
@@ -21,8 +24,8 @@ public class KieServerImpl implements KieServer {
     }
 
     @Override
-    public <T> Response execute(BatchExecutionCommand command) {
-        return Response.ok(command.execute(context)).build();
+    public Response execute(BatchExecutionCommand command) {
+        return Response.ok(new GenericEntity<List<ServiceResponse>>(command.execute(context)){}).build();
     }
 
     public static class KieServerCommandContextImpl implements KieServerCommandContext {
