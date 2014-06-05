@@ -12,6 +12,9 @@ import org.kie.server.api.KieServer;
 import org.kie.server.api.command.BatchExecutionCommand;
 import org.kie.server.api.command.KieServerCommandContext;
 import org.kie.server.api.command.ServiceResponse;
+import org.kie.server.api.command.impl.CreateContainerCommand;
+import org.kie.server.api.command.impl.DisposeContainerCommand;
+import org.kie.server.api.command.impl.ListContainersCommand;
 
 public class KieServerImpl implements KieServer {
 
@@ -27,7 +30,22 @@ public class KieServerImpl implements KieServer {
     public Response execute(BatchExecutionCommand command) {
         return Response.ok(new GenericEntity<List<ServiceResponse>>(command.execute(context)){}).build();
     }
+    
+    @Override
+    public Response listContainers() {
+        return Response.ok(new ListContainersCommand().execute(context)).build();
+    }
 
+    @Override
+    public Response createContainer(CreateContainerCommand command) {
+        return Response.ok(command.execute(context)).build();
+    }
+    
+    @Override
+    public Response disposeContainer(String id) {
+        return Response.ok(new DisposeContainerCommand(id).execute(context)).build();
+    }
+    
     public static class KieServerCommandContextImpl implements KieServerCommandContext {
 
         private final Map<String, KieContainerInfo> containers;
