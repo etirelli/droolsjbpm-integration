@@ -38,4 +38,10 @@ public interface KieServer {
     @Produces("application/xml")
     public Response disposeContainer( @PathParam("id") String id );
     
+    @POST
+    @Path("containers/{id}")
+    @Consumes("application/xml")
+    @Produces("application/xml")
+    public Response execute( @PathParam("id") String id, String cmdPayload );
+    
 } 

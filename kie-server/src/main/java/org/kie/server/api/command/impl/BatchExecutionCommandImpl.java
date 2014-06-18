@@ -48,7 +48,8 @@ public class BatchExecutionCommandImpl implements BatchExecutionCommand {
     @XmlElements({
         @XmlElement(name = "create-container", type = CreateContainerCommand.class),
         @XmlElement(name = "list-containers", type = ListContainersCommand.class),
-        @XmlElement(name = "dispose-container", type = DisposeContainerCommand.class)
+        @XmlElement(name = "dispose-container", type = DisposeContainerCommand.class),
+        @XmlElement(name = "call-container", type = DisposeContainerCommand.class)
     })
     protected List<KieServerCommand> commands;
 

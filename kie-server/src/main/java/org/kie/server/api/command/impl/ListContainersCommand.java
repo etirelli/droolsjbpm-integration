@@ -23,7 +23,6 @@ public class ListContainersCommand implements KieServerCommand {
     @Override
     public ServiceResponse execute(KieServerCommandContext context) {
         try {
-            System.out.println(">>>>>>>> "+context.getContainers().values());
             return new ServiceResponse(ServiceResponse.ResponseType.SUCCESS, "List of created containers", new ArrayList<KieContainerInfo>( context.getContainers().values() ) );
         } catch (Exception e) {
             return new ServiceResponse(ServiceResponse.ResponseType.FAILURE, "Error listing containers: "+
