@@ -57,8 +57,9 @@ import com.thoughtworks.xstream.XStream;
 
 public class XStreamXml {
 
-    public static XStream newXStreamMarshaller() {
+    public static XStream newXStreamMarshaller(ClassLoader classLoader) {
         XStream xstream = new XStream();
+        xstream.setClassLoader(classLoader);
         setAliases(xstream);
 
         xstream.addImplicitCollection(BatchExecutionCommandImpl.class, "commands");

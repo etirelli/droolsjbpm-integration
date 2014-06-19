@@ -27,19 +27,28 @@ public class ServiceResponse {
         @XmlElement(name = "container", type = KieContainerInfoImpl.class),
     })
     private List<KieContainerInfo> containers;
+    @XmlElement
+    private Object result;
     
     
     public ServiceResponse() {
     }
     
     public ServiceResponse(ServiceResponse.ResponseType type, String msg) {
-        this( type, msg, null );
+        this.type = type;
+        this.msg = msg;
     }
     
     public ServiceResponse(ServiceResponse.ResponseType type, String msg, List<KieContainerInfo> containers) {
         this.type = type;
         this.msg = msg;
         this.containers = containers;
+    }
+    
+    public ServiceResponse(ServiceResponse.ResponseType type, String msg, Object result ) {
+        this.type = type;
+        this.msg = msg;
+        this.result = result;
     }
     
     public ServiceResponse.ResponseType getType() {
@@ -64,6 +73,14 @@ public class ServiceResponse {
     
     public void setContainers(List<KieContainerInfo> containers) {
         this.containers = containers;
+    }
+    
+    public Object getResult() {
+        return result;
+    }
+    
+    public void setResult(Object result) {
+        this.result = result;
     }
 
     @Override

@@ -2,18 +2,23 @@ package org.kie.server.impl;
 
 import static org.kie.scanner.MavenRepository.getMavenRepository;
 
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.IOException;
+
 import javax.ws.rs.core.Response;
 
 import org.apache.cxf.endpoint.Server;
 import org.apache.cxf.jaxrs.JAXRSServerFactoryBean;
 import org.apache.cxf.jaxrs.client.JAXRSClientFactoryBean;
+import org.apache.cxf.jaxrs.lifecycle.SingletonResourceProvider;
 import org.apache.cxf.transport.local.LocalTransportFactory;
 import org.drools.compiler.kie.builder.impl.InternalKieModule;
+import org.junit.After;
 import org.junit.AfterClass;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.BeforeClass;
-import org.junit.Ignore;
 import org.junit.Test;
 import org.kie.api.KieServices;
 import org.kie.api.builder.KieBuilder;
@@ -34,23 +39,23 @@ public class KieServerTest {
 
     @BeforeClass
     public static void initialize() throws Exception {
-        startServer();
         createAndDeployKJar();
     }
 
     @AfterClass
     public static void destroy() throws Exception {
-        server.stop();
-        server.destroy();
     }
 
     @Before
-    public void setup() {
-        JAXRSClientFactoryBean bean = new JAXRSClientFactoryBean();
-        bean.setTransportId(LocalTransportFactory.TRANSPORT_ID);
-        bean.setAddress(BASE_ADDRESS);
-        bean.setServiceClass(KieServer.class);
-        proxy = bean.create(KieServer.class);
+    public void setup() throws Exception {
+        startServer();
+        startClient();
+    }
+
+    @After
+    public void tearDown() {
+        server.stop();
+        server.destroy();
     }
 
     @Test
@@ -69,7 +74,6 @@ public class KieServerTest {
     }
 
     @Test
-    @Ignore("not keeping state in between calls. need to figure why.")
     public void testListContainers() {
         Response response = proxy.createContainer(new CreateContainerCommand("kie1", releaseId));
         Assert.assertEquals(Response.Status.OK.getStatusCode(), response.getStatus());
@@ -79,6 +83,25 @@ public class KieServerTest {
         ServiceResponse reply = response.readEntity(ServiceResponse.class);
         Assert.assertEquals(ServiceResponse.ResponseType.SUCCESS, reply.getType());
         Assert.assertEquals(1, reply.getContainers().size());
+    }
+
+    @Test
+    public void testCallContainer() {
+        Response response = proxy.createContainer(new CreateContainerCommand("kie1", releaseId));
+        Assert.assertEquals(Response.Status.OK.getStatusCode(), response.getStatus());
+        
+        String payload = "<batch-execution>\n" + 
+                "  <insert out-identifier=\"message\">\n" + 
+                "    <org.pkg1.Message>\n" + 
+                "      <text>Hello World</text>\n" + 
+                "    </org.pkg1.Message>\n" + 
+                "  </insert>\n" + 
+                "</batch-execution>";
+
+        response = proxy.execute("kie1", payload);
+        Assert.assertEquals(Response.Status.OK.getStatusCode(), response.getStatus());
+        ServiceResponse reply = response.readEntity(ServiceResponse.class);
+        Assert.assertEquals(ServiceResponse.ResponseType.SUCCESS, reply.getType());
     }
 
     public static byte[] createAndDeployJar(KieServices ks,
@@ -97,20 +120,39 @@ public class KieServerTest {
                 kb.getResults().hasMessages(org.kie.api.builder.Message.Level.ERROR));
         InternalKieModule kieModule = (InternalKieModule) ks.getRepository().getKieModule(releaseId);
         byte[] jar = kieModule.getBytes();
+        
+        try {
+            FileOutputStream fos = new FileOutputStream("target/baz-2.1.0.GA.jar");
+            fos.write(jar);
+            fos.close();
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
 
         repository = getMavenRepository();
         repository.deployArtifact(releaseId, jar, pom);
         return jar;
     }
 
-    private static void startServer() throws Exception {
+    private void startServer() throws Exception {
         JAXRSServerFactoryBean sf = new JAXRSServerFactoryBean();
         sf.setTransportId(LocalTransportFactory.TRANSPORT_ID);
         sf.setAddress(BASE_ADDRESS);
         sf.setResourceClasses(KieServerImpl.class);
+        sf.setResourceProvider(new SingletonResourceProvider(new KieServerImpl()));
         server = sf.create();
     }
 
+    private void startClient() {
+        JAXRSClientFactoryBean bean = new JAXRSClientFactoryBean();
+        bean.setTransportId(LocalTransportFactory.TRANSPORT_ID);
+        bean.setAddress(BASE_ADDRESS);
+        bean.setServiceClass(KieServer.class);
+        proxy = bean.create(KieServer.class);
+    }
+    
     private static void createAndDeployKJar() {
         String drl = "package org.pkg1\n"
                 + "global java.util.List list;"
