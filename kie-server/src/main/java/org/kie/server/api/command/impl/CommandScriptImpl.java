@@ -27,7 +27,7 @@ import javax.xml.bind.annotation.XmlElements;
 import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.XmlType;
 
-import org.kie.server.api.command.BatchExecutionCommand;
+import org.kie.server.api.command.CommandScript;
 import org.kie.server.api.command.KieServerCommand;
 import org.kie.server.api.command.KieServerCommandContext;
 import org.kie.server.api.command.ServiceResponse;
@@ -37,7 +37,7 @@ import com.thoughtworks.xstream.annotations.XStreamAsAttribute;
 @XmlRootElement(name = "batch-execution")
 @XmlAccessorType(XmlAccessType.FIELD)
 @XmlType(name = "batch-execution", propOrder = {"lookup", "commands"})
-public class BatchExecutionCommandImpl implements BatchExecutionCommand {
+public class CommandScriptImpl implements CommandScript {
 
     private static final long serialVersionUID = 510l;
 
@@ -49,18 +49,18 @@ public class BatchExecutionCommandImpl implements BatchExecutionCommand {
         @XmlElement(name = "create-container", type = CreateContainerCommand.class),
         @XmlElement(name = "list-containers", type = ListContainersCommand.class),
         @XmlElement(name = "dispose-container", type = DisposeContainerCommand.class),
-        @XmlElement(name = "call-container", type = DisposeContainerCommand.class)
+        @XmlElement(name = "call-container", type = CallContainerCommand.class)
     })
     protected List<KieServerCommand> commands;
 
-    public BatchExecutionCommandImpl() {
+    public CommandScriptImpl() {
     }
 
-    public BatchExecutionCommandImpl(List<KieServerCommand> commands) {
+    public CommandScriptImpl(List<KieServerCommand> commands) {
         this.commands = commands;
     }
 
-    public BatchExecutionCommandImpl(List<KieServerCommand> commands, String lookup) {
+    public CommandScriptImpl(List<KieServerCommand> commands, String lookup) {
         this.commands = commands;
         this.lookup = lookup;
     }
@@ -89,7 +89,7 @@ public class BatchExecutionCommandImpl implements BatchExecutionCommand {
     }
 
     public String toString() {
-        return "BatchExecutionCommandImpl{" +
+        return "CommandScriptImpl{" +
                 "lookup='" + lookup + '\'' +
                 ", commands=" + commands +
                 '}';

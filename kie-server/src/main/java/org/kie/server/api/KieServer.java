@@ -9,17 +9,16 @@ import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
 import javax.ws.rs.core.Response;
 
-import org.kie.server.api.command.BatchExecutionCommand;
+import org.kie.server.api.command.CommandScript;
 import org.kie.server.api.command.impl.CreateContainerCommand;
 
 @Path("/server")
 public interface KieServer {
     
     @POST
-    @Path("execute")
     @Consumes("application/xml")
     @Produces("application/xml")
-    public Response execute( BatchExecutionCommand command );
+    public Response execute( CommandScript command );
     
     @GET
     @Path("containers")

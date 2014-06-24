@@ -21,10 +21,10 @@ import java.util.List;
 import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
 
 import org.kie.api.command.Command;
-import org.kie.server.impl.adapters.BatchExecutionCommandAdapter;
+import org.kie.server.impl.adapters.CommandScriptAdapter;
 
-@XmlJavaTypeAdapter(BatchExecutionCommandAdapter.class)
-public interface BatchExecutionCommand extends Command<List<ServiceResponse>> {
+@XmlJavaTypeAdapter(CommandScriptAdapter.class)
+public interface CommandScript extends Command<List<ServiceResponse>> {
     
     List<ServiceResponse> execute(KieServerCommandContext context);
 

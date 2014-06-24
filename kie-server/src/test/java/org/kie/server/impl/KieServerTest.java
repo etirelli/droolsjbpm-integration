@@ -2,10 +2,18 @@ package org.kie.server.impl;
 
 import static org.kie.scanner.MavenRepository.getMavenRepository;
 
+import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.lang.reflect.Method;
+import java.net.URL;
+import java.net.URLClassLoader;
+import java.util.Arrays;
+import java.util.List;
 
+import javax.ws.rs.core.GenericEntity;
+import javax.ws.rs.core.GenericType;
 import javax.ws.rs.core.Response;
 
 import org.apache.cxf.endpoint.Server;
@@ -24,10 +32,22 @@ import org.kie.api.KieServices;
 import org.kie.api.builder.KieBuilder;
 import org.kie.api.builder.KieFileSystem;
 import org.kie.api.builder.ReleaseId;
+import org.kie.api.command.BatchExecutionCommand;
+import org.kie.api.command.Command;
+import org.kie.api.command.KieCommands;
+import org.kie.api.runtime.ExecutionResults;
+import org.kie.internal.runtime.helper.BatchExecutionHelper;
 import org.kie.scanner.MavenRepository;
 import org.kie.server.api.KieServer;
+import org.kie.server.api.command.CommandScript;
+import org.kie.server.api.command.KieServerCommand;
 import org.kie.server.api.command.ServiceResponse;
+import org.kie.server.api.command.impl.CallContainerCommand;
+import org.kie.server.api.command.impl.CommandScriptImpl;
 import org.kie.server.api.command.impl.CreateContainerCommand;
+import org.kie.server.api.command.impl.DisposeContainerCommand;
+
+import com.thoughtworks.xstream.XStream;
 
 public class KieServerTest {
 
@@ -89,8 +109,99 @@ public class KieServerTest {
     public void testCallContainer() {
         Response response = proxy.createContainer(new CreateContainerCommand("kie1", releaseId));
         Assert.assertEquals(Response.Status.OK.getStatusCode(), response.getStatus());
+        String payload = "<batch-execution lookup=\"defaultKieSession\">\n" + 
+                "  <insert out-identifier=\"message\">\n" + 
+                "    <org.pkg1.Message>\n" + 
+                "      <text>Hello World</text>\n" + 
+                "    </org.pkg1.Message>\n" + 
+                "  </insert>\n" +
+                "  <fire-all-rules/>\n"+
+                "</batch-execution>";
+
+        response = proxy.execute("kie1", payload);
+        Assert.assertEquals(Response.Status.OK.getStatusCode(), response.getStatus());
+        ServiceResponse reply = response.readEntity(ServiceResponse.class);
+        Assert.assertEquals(ServiceResponse.ResponseType.SUCCESS, reply.getType());
         
-        String payload = "<batch-execution>\n" + 
+        System.out.println(reply.getMsg());
+        System.out.println(reply.getResult());
+    }
+
+    @Test
+    public void testCallContainerMarshallCommands() throws Exception {
+        Response response = proxy.createContainer(new CreateContainerCommand("kie1", releaseId));
+        Assert.assertEquals(Response.Status.OK.getStatusCode(), response.getStatus());
+
+        KieServices ks = KieServices.Factory.get();
+        File jar = MavenRepository.getMavenRepository().resolveArtifact(releaseId).getFile();
+        URLClassLoader cl = new URLClassLoader(new URL[] { jar.toURI().toURL() } );
+        Class<?> messageClass = cl.loadClass("org.pkg1.Message");
+        Object message = messageClass.newInstance();
+        Method setter = messageClass.getMethod("setText", String.class);
+        Method getter = messageClass.getMethod("getText");
+        setter.invoke(message, "HelloWorld");
+        
+        KieCommands kcmd = ks.getCommands();
+        Command insert = kcmd.newInsert(message, "message");
+        Command fire = kcmd.newFireAllRules();
+        BatchExecutionCommand batch = kcmd.newBatchExecution(Arrays.asList(insert, fire), "defaultKieSession");
+        
+        String payload = BatchExecutionHelper.newXStreamMarshaller().toXML(batch);
+
+        response = proxy.execute("kie1", payload);
+        Assert.assertEquals(Response.Status.OK.getStatusCode(), response.getStatus());
+        ServiceResponse reply = response.readEntity(ServiceResponse.class);
+        Assert.assertEquals(ServiceResponse.ResponseType.SUCCESS, reply.getType());
+        
+        XStream xs = BatchExecutionHelper.newXStreamMarshaller();
+        xs.setClassLoader(cl);
+        ExecutionResults results = (ExecutionResults) xs.fromXML((String) reply.getResult());
+        Object value = results.getValue("message");
+        Assert.assertEquals("echo:HelloWorld", getter.invoke(value));
+    }
+    
+    @Test
+    public void testCommandScript() throws Exception {
+        KieServices ks = KieServices.Factory.get();
+        File jar = MavenRepository.getMavenRepository().resolveArtifact(releaseId).getFile();
+        URLClassLoader cl = new URLClassLoader(new URL[] { jar.toURI().toURL() } );
+        Class<?> messageClass = cl.loadClass("org.pkg1.Message");
+        Object message = messageClass.newInstance();
+        Method setter = messageClass.getMethod("setText", String.class);
+        Method getter = messageClass.getMethod("getText");
+        setter.invoke(message, "HelloWorld");
+        
+        KieCommands kcmd = ks.getCommands();
+        Command insert = kcmd.newInsert(message, "message");
+        Command fire = kcmd.newFireAllRules();
+        BatchExecutionCommand batch = kcmd.newBatchExecution(Arrays.asList(insert, fire), "defaultKieSession");
+        
+        String payload = BatchExecutionHelper.newXStreamMarshaller().toXML(batch);
+
+        KieServerCommand create = new CreateContainerCommand("kie1", releaseId);
+        KieServerCommand call = new CallContainerCommand("kie1", payload);
+        KieServerCommand dispose = new DisposeContainerCommand("kie1");
+        
+        List<KieServerCommand> cmds = Arrays.asList(create, call, dispose);
+        CommandScript script = new CommandScriptImpl(cmds);
+        
+        Response response = proxy.execute(script);
+        
+        Assert.assertEquals(Response.Status.OK.getStatusCode(), response.getStatus());
+        List<ServiceResponse> reply = response.readEntity(new GenericType<List<ServiceResponse>>(){});
+        for( ServiceResponse r : reply ) {
+            System.out.println(">>>> Message: "+r.getMsg());
+            System.out.println(">>>> Result : "+r.getResult());
+            Assert.assertEquals(ServiceResponse.ResponseType.SUCCESS, r.getType());
+        }
+    }
+    
+    @Test
+    public void testCallContainerLookupError() {
+        Response response = proxy.createContainer(new CreateContainerCommand("kie1", releaseId));
+        Assert.assertEquals(Response.Status.OK.getStatusCode(), response.getStatus());
+        
+        String payload = "<batch-execution lookup=\"xyz\">\n" + 
                 "  <insert out-identifier=\"message\">\n" + 
                 "    <org.pkg1.Message>\n" + 
                 "      <text>Hello World</text>\n" + 
@@ -101,7 +212,7 @@ public class KieServerTest {
         response = proxy.execute("kie1", payload);
         Assert.assertEquals(Response.Status.OK.getStatusCode(), response.getStatus());
         ServiceResponse reply = response.readEntity(ServiceResponse.class);
-        Assert.assertEquals(ServiceResponse.ResponseType.SUCCESS, reply.getType());
+        Assert.assertEquals(ServiceResponse.ResponseType.FAILURE, reply.getType());
     }
 
     public static byte[] createAndDeployJar(KieServices ks,

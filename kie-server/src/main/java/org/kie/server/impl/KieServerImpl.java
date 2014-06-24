@@ -9,7 +9,7 @@ import javax.ws.rs.core.Response;
 
 import org.kie.server.api.KieContainerInfo;
 import org.kie.server.api.KieServer;
-import org.kie.server.api.command.BatchExecutionCommand;
+import org.kie.server.api.command.CommandScript;
 import org.kie.server.api.command.KieServerCommandContext;
 import org.kie.server.api.command.ServiceResponse;
 import org.kie.server.api.command.impl.CallContainerCommand;
@@ -28,7 +28,7 @@ public class KieServerImpl implements KieServer {
     }
 
     @Override
-    public Response execute(BatchExecutionCommand command) {
+    public Response execute(CommandScript command) {
         return Response.ok(new GenericEntity<List<ServiceResponse>>(command.execute(context)){}).build();
     }
     
