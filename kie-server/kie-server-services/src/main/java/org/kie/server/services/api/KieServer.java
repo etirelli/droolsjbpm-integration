@@ -1,4 +1,4 @@
-package org.kie.server.api;
+package org.kie.server.services.api;
 
 import javax.ws.rs.Consumes;
 import javax.ws.rs.DELETE;
@@ -9,8 +9,8 @@ import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
 import javax.ws.rs.core.Response;
 
-import org.kie.server.api.command.CommandScript;
-import org.kie.server.api.command.impl.CreateContainerCommand;
+import org.kie.server.services.api.command.CommandScript;
+import org.kie.server.services.api.command.impl.CreateContainerCommand;
 
 @Path("/server")
 public interface KieServer {

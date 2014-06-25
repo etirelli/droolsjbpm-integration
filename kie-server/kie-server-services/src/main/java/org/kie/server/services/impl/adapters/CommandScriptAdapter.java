@@ -1,9 +1,9 @@
-package org.kie.server.impl.adapters;
+package org.kie.server.services.impl.adapters;
 
 import javax.xml.bind.annotation.adapters.XmlAdapter;
 
-import org.kie.server.api.command.CommandScript;
-import org.kie.server.api.command.impl.CommandScriptImpl;
+import org.kie.server.services.api.command.CommandScript;
+import org.kie.server.services.api.command.impl.CommandScriptImpl;
 
 
 public class CommandScriptAdapter extends XmlAdapter<CommandScriptImpl, CommandScript>{

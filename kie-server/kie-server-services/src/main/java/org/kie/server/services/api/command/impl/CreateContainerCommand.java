@@ -1,4 +1,4 @@
-package org.kie.server.api.command.impl;
+package org.kie.server.services.api.command.impl;
 
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
@@ -9,11 +9,11 @@ import javax.xml.bind.annotation.XmlRootElement;
 import org.drools.compiler.kie.builder.impl.InternalKieContainer;
 import org.kie.api.KieServices;
 import org.kie.api.builder.ReleaseId;
-import org.kie.server.api.KieContainerInfo;
-import org.kie.server.api.command.KieServerCommand;
-import org.kie.server.api.command.KieServerCommandContext;
-import org.kie.server.api.command.ServiceResponse;
-import org.kie.server.impl.KieContainerInfoImpl;
+import org.kie.server.services.api.KieContainerInfo;
+import org.kie.server.services.api.command.KieServerCommand;
+import org.kie.server.services.api.command.KieServerCommandContext;
+import org.kie.server.services.api.command.ServiceResponse;
+import org.kie.server.services.impl.KieContainerInfoImpl;
 
 @XmlRootElement(name="create-container")
 @XmlAccessorType(XmlAccessType.NONE)

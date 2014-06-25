@@ -1,4 +1,4 @@
-package org.kie.server.impl.adapters;
+package org.kie.server.services.impl.adapters;
 
 import javax.xml.bind.annotation.adapters.XmlAdapter;
 

@@ -1,4 +1,4 @@
-package org.kie.server.impl;
+package org.kie.server.services.impl;
 
 import javax.xml.bind.annotation.XmlElement;
 

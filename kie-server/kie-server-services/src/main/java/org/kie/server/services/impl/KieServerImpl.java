@@ -1,4 +1,4 @@
-package org.kie.server.impl;
+package org.kie.server.services.impl;
 
 import java.util.List;
 import java.util.Map;
@@ -7,15 +7,15 @@ import java.util.concurrent.ConcurrentHashMap;
 import javax.ws.rs.core.GenericEntity;
 import javax.ws.rs.core.Response;
 
-import org.kie.server.api.KieContainerInfo;
-import org.kie.server.api.KieServer;
-import org.kie.server.api.command.CommandScript;
-import org.kie.server.api.command.KieServerCommandContext;
-import org.kie.server.api.command.ServiceResponse;
-import org.kie.server.api.command.impl.CallContainerCommand;
-import org.kie.server.api.command.impl.CreateContainerCommand;
-import org.kie.server.api.command.impl.DisposeContainerCommand;
-import org.kie.server.api.command.impl.ListContainersCommand;
+import org.kie.server.services.api.KieContainerInfo;
+import org.kie.server.services.api.KieServer;
+import org.kie.server.services.api.command.CommandScript;
+import org.kie.server.services.api.command.KieServerCommandContext;
+import org.kie.server.services.api.command.ServiceResponse;
+import org.kie.server.services.api.command.impl.CallContainerCommand;
+import org.kie.server.services.api.command.impl.CreateContainerCommand;
+import org.kie.server.services.api.command.impl.DisposeContainerCommand;
+import org.kie.server.services.api.command.impl.ListContainersCommand;
 
 public class KieServerImpl implements KieServer {
 

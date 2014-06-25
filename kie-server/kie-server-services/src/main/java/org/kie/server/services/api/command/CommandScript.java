@@ -14,14 +14,14 @@
  * limitations under the License.
  */
 
-package org.kie.server.api.command;
+package org.kie.server.services.api.command;
 
 import java.util.List;
 
 import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
 
 import org.kie.api.command.Command;
-import org.kie.server.impl.adapters.CommandScriptAdapter;
+import org.kie.server.services.impl.adapters.CommandScriptAdapter;
 
 @XmlJavaTypeAdapter(CommandScriptAdapter.class)
 public interface CommandScript extends Command<List<ServiceResponse>> {

@@ -1,4 +1,4 @@
-package org.kie.server.api.command.impl;
+package org.kie.server.services.api.command.impl;
 
 import java.util.Arrays;
 import java.util.regex.Matcher;
@@ -15,11 +15,11 @@ import org.drools.core.command.runtime.BatchExecutionCommandImpl;
 import org.kie.api.command.Command;
 import org.kie.api.runtime.ExecutionResults;
 import org.kie.api.runtime.KieSession;
-import org.kie.server.api.command.KieServerCommand;
-import org.kie.server.api.command.KieServerCommandContext;
-import org.kie.server.api.command.ServiceResponse;
-import org.kie.server.impl.KieContainerInfoImpl;
-import org.kie.server.impl.XStreamXml;
+import org.kie.server.services.api.command.KieServerCommand;
+import org.kie.server.services.api.command.KieServerCommandContext;
+import org.kie.server.services.api.command.ServiceResponse;
+import org.kie.server.services.impl.KieContainerInfoImpl;
+import org.kie.server.services.impl.XStreamXml;
 
 import com.thoughtworks.xstream.XStream;
 

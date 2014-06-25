@@ -37,14 +37,15 @@ import org.kie.api.command.KieCommands;
 import org.kie.api.runtime.ExecutionResults;
 import org.kie.internal.runtime.helper.BatchExecutionHelper;
 import org.kie.scanner.MavenRepository;
-import org.kie.server.api.KieServer;
-import org.kie.server.api.command.CommandScript;
-import org.kie.server.api.command.KieServerCommand;
-import org.kie.server.api.command.ServiceResponse;
-import org.kie.server.api.command.impl.CallContainerCommand;
-import org.kie.server.api.command.impl.CommandScriptImpl;
-import org.kie.server.api.command.impl.CreateContainerCommand;
-import org.kie.server.api.command.impl.DisposeContainerCommand;
+import org.kie.server.services.api.KieServer;
+import org.kie.server.services.api.command.CommandScript;
+import org.kie.server.services.api.command.KieServerCommand;
+import org.kie.server.services.api.command.ServiceResponse;
+import org.kie.server.services.api.command.impl.CallContainerCommand;
+import org.kie.server.services.api.command.impl.CommandScriptImpl;
+import org.kie.server.services.api.command.impl.CreateContainerCommand;
+import org.kie.server.services.api.command.impl.DisposeContainerCommand;
+import org.kie.server.services.impl.KieServerImpl;
 
 import com.thoughtworks.xstream.XStream;
 

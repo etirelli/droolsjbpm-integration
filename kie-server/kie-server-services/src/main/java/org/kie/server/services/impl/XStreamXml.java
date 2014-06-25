@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package org.kie.server.impl;
+package org.kie.server.services.impl;
 
 import org.drools.core.command.runtime.BatchExecutionCommandImpl;
 import org.drools.core.command.runtime.GetGlobalCommand;

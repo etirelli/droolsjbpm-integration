@@ -1,9 +1,9 @@
-package org.kie.server.impl.adapters;
+package org.kie.server.services.impl.adapters;
 
 import javax.xml.bind.annotation.adapters.XmlAdapter;
 
-import org.kie.server.api.KieContainerInfo;
-import org.kie.server.impl.KieContainerInfoImpl;
+import org.kie.server.services.api.KieContainerInfo;
+import org.kie.server.services.impl.KieContainerInfoImpl;
 
 
 public class KieContainerInfoAdapter extends XmlAdapter<KieContainerInfoImpl, KieContainerInfo>{

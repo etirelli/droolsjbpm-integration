@@ -1,4 +1,4 @@
-package org.kie.server.api.command.impl;
+package org.kie.server.services.api.command.impl;
 
 import java.util.ArrayList;
 
@@ -6,10 +6,10 @@ import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlRootElement;
 
-import org.kie.server.api.KieContainerInfo;
-import org.kie.server.api.command.KieServerCommand;
-import org.kie.server.api.command.KieServerCommandContext;
-import org.kie.server.api.command.ServiceResponse;
+import org.kie.server.services.api.KieContainerInfo;
+import org.kie.server.services.api.command.KieServerCommand;
+import org.kie.server.services.api.command.KieServerCommandContext;
+import org.kie.server.services.api.command.ServiceResponse;
 
 @XmlRootElement(name="list-containers")
 @XmlAccessorType(XmlAccessType.NONE)

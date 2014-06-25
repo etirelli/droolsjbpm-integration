@@ -1,10 +1,10 @@
-package org.kie.server.impl.adapters;
+package org.kie.server.services.impl.adapters;
 
 import javax.xml.bind.annotation.adapters.XmlAdapter;
 
 import org.drools.compiler.kproject.ReleaseIdImpl;
 import org.kie.api.builder.ReleaseId;
-import org.kie.server.impl.KSReleaseIdImpl;
+import org.kie.server.services.impl.KSReleaseIdImpl;
 
 
 public class ReleaseIdAdapter extends XmlAdapter<KSReleaseIdImpl, ReleaseId>{

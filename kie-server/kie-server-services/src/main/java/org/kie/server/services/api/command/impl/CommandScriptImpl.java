@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package org.kie.server.api.command.impl;
+package org.kie.server.services.api.command.impl;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -27,10 +27,10 @@ import javax.xml.bind.annotation.XmlElements;
 import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.XmlType;
 
-import org.kie.server.api.command.CommandScript;
-import org.kie.server.api.command.KieServerCommand;
-import org.kie.server.api.command.KieServerCommandContext;
-import org.kie.server.api.command.ServiceResponse;
+import org.kie.server.services.api.command.CommandScript;
+import org.kie.server.services.api.command.KieServerCommand;
+import org.kie.server.services.api.command.KieServerCommandContext;
+import org.kie.server.services.api.command.ServiceResponse;
 
 import com.thoughtworks.xstream.annotations.XStreamAsAttribute;
 

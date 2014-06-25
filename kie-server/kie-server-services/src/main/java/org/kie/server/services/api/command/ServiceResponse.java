@@ -1,4 +1,4 @@
-package org.kie.server.api.command;
+package org.kie.server.services.api.command;
 
 import java.util.List;
 
@@ -9,8 +9,8 @@ import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlElements;
 import javax.xml.bind.annotation.XmlRootElement;
 
-import org.kie.server.api.KieContainerInfo;
-import org.kie.server.impl.KieContainerInfoImpl;
+import org.kie.server.services.api.KieContainerInfo;
+import org.kie.server.services.impl.KieContainerInfoImpl;
 
 @XmlRootElement(name="response")
 @XmlAccessorType(XmlAccessType.NONE)
