@@ -12,7 +12,6 @@ import java.net.URLClassLoader;
 import java.util.Arrays;
 import java.util.List;
 
-import javax.ws.rs.core.GenericEntity;
 import javax.ws.rs.core.GenericType;
 import javax.ws.rs.core.Response;
 
@@ -122,9 +121,6 @@ public class KieServerTest {
         Assert.assertEquals(Response.Status.OK.getStatusCode(), response.getStatus());
         ServiceResponse reply = response.readEntity(ServiceResponse.class);
         Assert.assertEquals(ServiceResponse.ResponseType.SUCCESS, reply.getType());
-        
-        System.out.println(reply.getMsg());
-        System.out.println(reply.getResult());
     }
 
     @Test
@@ -142,8 +138,8 @@ public class KieServerTest {
         setter.invoke(message, "HelloWorld");
         
         KieCommands kcmd = ks.getCommands();
-        Command insert = kcmd.newInsert(message, "message");
-        Command fire = kcmd.newFireAllRules();
+        Command<?> insert = kcmd.newInsert(message, "message");
+        Command<?> fire = kcmd.newFireAllRules();
         BatchExecutionCommand batch = kcmd.newBatchExecution(Arrays.asList(insert, fire), "defaultKieSession");
         
         String payload = BatchExecutionHelper.newXStreamMarshaller().toXML(batch);
@@ -158,6 +154,8 @@ public class KieServerTest {
         ExecutionResults results = (ExecutionResults) xs.fromXML((String) reply.getResult());
         Object value = results.getValue("message");
         Assert.assertEquals("echo:HelloWorld", getter.invoke(value));
+        
+        cl.close();
     }
     
     @Test
@@ -168,12 +166,11 @@ public class KieServerTest {
         Class<?> messageClass = cl.loadClass("org.pkg1.Message");
         Object message = messageClass.newInstance();
         Method setter = messageClass.getMethod("setText", String.class);
-        Method getter = messageClass.getMethod("getText");
         setter.invoke(message, "HelloWorld");
         
         KieCommands kcmd = ks.getCommands();
-        Command insert = kcmd.newInsert(message, "message");
-        Command fire = kcmd.newFireAllRules();
+        Command<?> insert = kcmd.newInsert(message, "message");
+        Command<?> fire = kcmd.newFireAllRules();
         BatchExecutionCommand batch = kcmd.newBatchExecution(Arrays.asList(insert, fire), "defaultKieSession");
         
         String payload = BatchExecutionHelper.newXStreamMarshaller().toXML(batch);
@@ -190,10 +187,10 @@ public class KieServerTest {
         Assert.assertEquals(Response.Status.OK.getStatusCode(), response.getStatus());
         List<ServiceResponse> reply = response.readEntity(new GenericType<List<ServiceResponse>>(){});
         for( ServiceResponse r : reply ) {
-            System.out.println(">>>> Message: "+r.getMsg());
-            System.out.println(">>>> Result : "+r.getResult());
             Assert.assertEquals(ServiceResponse.ResponseType.SUCCESS, r.getType());
         }
+        
+        cl.close();
     }
     
     @Test

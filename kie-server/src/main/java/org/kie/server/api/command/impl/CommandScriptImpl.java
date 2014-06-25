@@ -34,9 +34,9 @@ import org.kie.server.api.command.ServiceResponse;
 
 import com.thoughtworks.xstream.annotations.XStreamAsAttribute;
 
-@XmlRootElement(name = "batch-execution")
+@XmlRootElement(name = "script")
 @XmlAccessorType(XmlAccessType.FIELD)
-@XmlType(name = "batch-execution", propOrder = {"lookup", "commands"})
+@XmlType(name = "script", propOrder = {"lookup", "commands"})
 public class CommandScriptImpl implements CommandScript {
 
     private static final long serialVersionUID = 510l;
