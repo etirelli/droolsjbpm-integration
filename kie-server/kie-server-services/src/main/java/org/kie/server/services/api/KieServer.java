@@ -9,10 +9,9 @@ import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
 import javax.ws.rs.core.Response;
 
+import org.kie.api.builder.ReleaseId;
 import org.kie.server.services.api.command.CommandScript;
-import org.kie.server.services.api.command.impl.CreateContainerCommand;
 
-@Path("/server")
 public interface KieServer {
     
     @POST
@@ -26,10 +25,10 @@ public interface KieServer {
     public Response listContainers();
     
     @POST
-    @Path("containers")
+    @Path("containers/{id}/create")
     @Consumes("application/xml")
     @Produces("application/xml")
-    public Response createContainer( CreateContainerCommand command );
+    public Response createContainer( @PathParam("id") String id, ReleaseId releaseId );
     
     @DELETE
     @Path("containers/{id}")

@@ -12,9 +12,19 @@
 
 	<name>KIE :: Execution Server :: Services</name>
 	<description>KIE Execution Server Services</description>
+	
+	<dependencyManagement>
+	    <dependencies>
+	        <dependency>
+    			<groupId>org.jboss.resteasy</groupId>
+	    		<artifactId>resteasy-spring</artifactId>
+	    		<version>2.3.7.Final</version>
+	        </dependency>
+	    </dependencies>
+	</dependencyManagement>
 
 	<dependencies>
-                <!-- kie server dependencies -->
+		<!-- kie server dependencies -->
 		<dependency>
 			<groupId>org.kie</groupId>
 			<artifactId>kie-server-api</artifactId>
@@ -40,47 +50,29 @@
 			<artifactId>kie-ci</artifactId>
 			<!-- scope>provided</scope -->
 		</dependency>
+
+		<!-- RestEasy dependencies -->
 		<dependency>
-			<groupId>org.kie</groupId>
-			<artifactId>kie-camel</artifactId>
+			<groupId>org.jboss.resteasy</groupId>
+			<artifactId>resteasy-jaxrs</artifactId>
+			<!-- scope>provided</scope -->
+		</dependency>
+		<dependency>
+			<groupId>org.jboss.resteasy</groupId>
+			<artifactId>jaxrs-api</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>org.jboss.resteasy</groupId>
+			<artifactId>resteasy-jaxb-provider</artifactId>
+			<!-- scope>provided</scope -->
+		</dependency>
+		<dependency>
+			<groupId>org.jboss.resteasy</groupId>
+			<artifactId>resteasy-spring</artifactId>
 			<!-- scope>provided</scope -->
 		</dependency>
 
-		<!-- CXF dependencies -->
-		<dependency>
-			<groupId>org.apache.cxf</groupId>
-			<artifactId>cxf-rt-frontend-jaxws</artifactId>
-			<!-- scope>provided</scope -->
-		</dependency>
-		<dependency>
-			<groupId>org.apache.cxf</groupId>
-			<artifactId>cxf-rt-frontend-jaxrs</artifactId>
-		</dependency>
-		<dependency>
-			<groupId>org.apache.cxf</groupId>
-			<artifactId>cxf-rt-transports-http</artifactId>
-			<!-- scope>provided</scope -->
-		</dependency>
-
-		<!-- enable CXF JMX -->
-		<dependency>
-			<groupId>org.apache.cxf</groupId>
-			<artifactId>cxf-rt-management</artifactId>
-			<!-- scope>provided</scope -->
-		</dependency>
-
-		<!-- avoid some old versions from transitive dependencies -->
-		<dependency>
-			<groupId>org.apache.cxf</groupId>
-			<artifactId>cxf-rt-bindings-soap</artifactId>
-			<!-- scope>provided</scope -->
-		</dependency>
-		<dependency>
-			<groupId>org.apache.cxf</groupId>
-			<artifactId>cxf-rt-databinding-jaxb</artifactId>
-			<!-- scope>provided</scope -->
-		</dependency>
-
+		<!-- Spring dependencies -->
 		<dependency>
 			<groupId>org.springframework</groupId>
 			<artifactId>spring-context</artifactId>
@@ -110,11 +102,6 @@
 		</dependency>
 
 		<!-- test dependencies -->
-		<dependency>
-			<groupId>org.apache.cxf</groupId>
-			<artifactId>cxf-rt-transports-local</artifactId>
-			<scope>test</scope>
-		</dependency>
 
 	</dependencies>
 

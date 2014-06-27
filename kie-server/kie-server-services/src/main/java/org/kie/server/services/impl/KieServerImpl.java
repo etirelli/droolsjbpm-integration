@@ -4,9 +4,11 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
+import javax.ws.rs.Path;
 import javax.ws.rs.core.GenericEntity;
 import javax.ws.rs.core.Response;
 
+import org.kie.api.builder.ReleaseId;
 import org.kie.server.services.api.KieContainerInfo;
 import org.kie.server.services.api.KieServer;
 import org.kie.server.services.api.command.CommandScript;
@@ -17,6 +19,7 @@ import org.kie.server.services.api.command.impl.CreateContainerCommand;
 import org.kie.server.services.api.command.impl.DisposeContainerCommand;
 import org.kie.server.services.api.command.impl.ListContainersCommand;
 
+@Path("/server")
 public class KieServerImpl implements KieServer {
 
     private final Map<String, KieContainerInfo> containers;
@@ -38,8 +41,8 @@ public class KieServerImpl implements KieServer {
     }
 
     @Override
-    public Response createContainer(CreateContainerCommand command) {
-        return Response.ok(command.execute(context)).build();
+    public Response createContainer(String id, ReleaseId releaseId ) {
+        return Response.ok(new CreateContainerCommand(id, releaseId).execute(context)).build();
     }
     
     @Override

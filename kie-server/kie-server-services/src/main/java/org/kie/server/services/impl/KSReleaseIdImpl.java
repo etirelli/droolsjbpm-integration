@@ -1,5 +1,6 @@
 package org.kie.server.services.impl;
 
+import javax.ws.rs.QueryParam;
 import javax.xml.bind.annotation.XmlElement;
 
 import org.kie.api.builder.ReleaseId;
@@ -10,8 +11,11 @@ import org.kie.api.builder.ReleaseId;
  */
 public class KSReleaseIdImpl implements ReleaseId {
 
+    @QueryParam("group-id")
     private String groupId;
+    @QueryParam("artifact-id")
     private String artifactId;
+    @QueryParam("version")
     private String version;
 
     public KSReleaseIdImpl() {
@@ -25,7 +29,7 @@ public class KSReleaseIdImpl implements ReleaseId {
         this.version = version;
     }
 
-    @XmlElement(required = true)
+    @XmlElement(required = true, name = "group-id")
     public String getGroupId() {
         return groupId;
     }
@@ -34,7 +38,7 @@ public class KSReleaseIdImpl implements ReleaseId {
         this.groupId = groupId;
     }
 
-    @XmlElement(required = true)
+    @XmlElement(required = true, name = "artifact-id")
     public String getArtifactId() {
         return artifactId;
     }
@@ -43,7 +47,7 @@ public class KSReleaseIdImpl implements ReleaseId {
         this.artifactId = artifactId;
     }
 
-    @XmlElement(required = true)
+    @XmlElement(required = true, name = "version")
     public String getVersion() {
         return version;
     }
