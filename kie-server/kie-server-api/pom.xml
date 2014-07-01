@@ -14,6 +14,12 @@
 	<description>KIE Execution Server API</description>
 
 	<dependencies>
+		<!-- core dependencies -->
+		<dependency>
+			<groupId>org.kie</groupId>
+			<artifactId>kie-api</artifactId>
+			<!-- scope>provided</scope -->
+		</dependency>
 
 	</dependencies>
 

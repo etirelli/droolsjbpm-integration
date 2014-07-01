@@ -1,8 +1,6 @@
-package org.kie.server.services.api.command;
+package org.kie.server.api.entity;
 
 import java.util.Map;
-
-import org.kie.server.services.api.KieContainerInfo;
 
 
 public interface KieServerCommandContext {

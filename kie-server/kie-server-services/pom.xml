@@ -12,15 +12,26 @@
 
 	<name>KIE :: Execution Server :: Services</name>
 	<description>KIE Execution Server Services</description>
-	
+
 	<dependencyManagement>
-	    <dependencies>
-	        <dependency>
-    			<groupId>org.jboss.resteasy</groupId>
-	    		<artifactId>resteasy-spring</artifactId>
-	    		<version>2.3.7.Final</version>
-	        </dependency>
-	    </dependencies>
+		<dependencies>
+			<dependency>
+				<groupId>org.jboss.resteasy</groupId>
+				<artifactId>resteasy-spring</artifactId>
+				<version>2.3.7.Final</version>
+			</dependency>
+			<dependency>
+				<groupId>javax.servlet</groupId>
+				<artifactId>servlet-api</artifactId>
+				<version>2.5</version>
+				<scope>test</scope>
+			</dependency>
+			<dependency>
+				<groupId>org.jboss.resteasy</groupId>
+				<artifactId>tjws</artifactId>
+				<version>2.3.7.Final</version>
+			</dependency>
+		</dependencies>
 	</dependencyManagement>
 
 	<dependencies>
@@ -102,7 +113,15 @@
 		</dependency>
 
 		<!-- test dependencies -->
-
+		<dependency>
+			<groupId>javax.servlet</groupId>
+			<artifactId>servlet-api</artifactId>
+			<scope>test</scope>
+		</dependency>
+		<dependency>
+			<groupId>org.jboss.resteasy</groupId>
+			<artifactId>tjws</artifactId>
+		</dependency>
 	</dependencies>
 
 	<build>

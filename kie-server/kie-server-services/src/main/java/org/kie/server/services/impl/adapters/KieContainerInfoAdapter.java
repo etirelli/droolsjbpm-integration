@@ -2,7 +2,7 @@ package org.kie.server.services.impl.adapters;
 
 import javax.xml.bind.annotation.adapters.XmlAdapter;
 
-import org.kie.server.services.api.KieContainerInfo;
+import org.kie.server.api.entity.KieContainerInfo;
 import org.kie.server.services.impl.KieContainerInfoImpl;
 
 

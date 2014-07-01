@@ -14,8 +14,9 @@
  * limitations under the License.
  */
 
-package org.kie.server.services.api.command.impl;
+package org.kie.server.api.commands;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -27,22 +28,16 @@ import javax.xml.bind.annotation.XmlElements;
 import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.XmlType;
 
-import org.kie.server.services.api.command.CommandScript;
-import org.kie.server.services.api.command.KieServerCommand;
-import org.kie.server.services.api.command.KieServerCommandContext;
-import org.kie.server.services.api.command.ServiceResponse;
-
-import com.thoughtworks.xstream.annotations.XStreamAsAttribute;
+import org.kie.server.api.entity.KieServerCommand;
 
 @XmlRootElement(name = "script")
 @XmlAccessorType(XmlAccessType.FIELD)
 @XmlType(name = "script", propOrder = {"lookup", "commands"})
-public class CommandScriptImpl implements CommandScript {
+public class CommandScript implements Serializable {
 
     private static final long serialVersionUID = 510l;
 
     @XmlAttribute
-    @XStreamAsAttribute
     private String            lookup;
 
     @XmlElements({
@@ -53,14 +48,14 @@ public class CommandScriptImpl implements CommandScript {
     })
     protected List<KieServerCommand> commands;
 
-    public CommandScriptImpl() {
+    public CommandScript() {
     }
 
-    public CommandScriptImpl(List<KieServerCommand> commands) {
+    public CommandScript(List<KieServerCommand> commands) {
         this.commands = commands;
     }
 
-    public CommandScriptImpl(List<KieServerCommand> commands, String lookup) {
+    public CommandScript(List<KieServerCommand> commands, String lookup) {
         this.commands = commands;
         this.lookup = lookup;
     }
@@ -70,14 +65,6 @@ public class CommandScriptImpl implements CommandScript {
             commands = new ArrayList<KieServerCommand>();
         }
         return this.commands;
-    }
-
-    public List<ServiceResponse> execute(KieServerCommandContext context) {
-        List<ServiceResponse> response = new ArrayList<ServiceResponse>();
-        for (KieServerCommand command : commands) {
-            response.add(command.execute(context));
-        }
-        return response;
     }
 
     public void setLookup(String lookup) {

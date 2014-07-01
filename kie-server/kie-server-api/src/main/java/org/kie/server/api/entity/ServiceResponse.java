@@ -1,4 +1,4 @@
-package org.kie.server.services.api.command;
+package org.kie.server.api.entity;
 
 import java.util.List;
 
@@ -8,9 +8,6 @@ import javax.xml.bind.annotation.XmlAttribute;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlElements;
 import javax.xml.bind.annotation.XmlRootElement;
-
-import org.kie.server.services.api.KieContainerInfo;
-import org.kie.server.services.impl.KieContainerInfoImpl;
 
 @XmlRootElement(name="response")
 @XmlAccessorType(XmlAccessType.NONE)
@@ -24,7 +21,7 @@ public class ServiceResponse {
     @XmlAttribute
     private String msg;
     @XmlElements({
-        @XmlElement(name = "container", type = KieContainerInfoImpl.class),
+        @XmlElement(name = "container", type = KieContainerInfo.class),
     })
     private List<KieContainerInfo> containers;
     @XmlElement

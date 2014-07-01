@@ -1,4 +1,4 @@
-package org.kie.server.services.api;
+package org.kie.server.api.entity;
 
 
 public interface KieContainerInfo {

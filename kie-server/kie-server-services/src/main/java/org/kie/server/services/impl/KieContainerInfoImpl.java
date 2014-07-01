@@ -4,7 +4,7 @@ import javax.xml.bind.annotation.XmlTransient;
 
 import org.drools.compiler.kie.builder.impl.InternalKieContainer;
 import org.kie.api.runtime.KieContainer;
-import org.kie.server.services.api.KieContainerInfo;
+import org.kie.server.api.entity.KieContainerInfo;
 
 public class KieContainerInfoImpl implements KieContainerInfo {
 
