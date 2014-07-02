@@ -1,37 +1,27 @@
-package org.kie.server.services.impl;
+package org.kie.server.api.model;
 
-import javax.xml.bind.annotation.XmlTransient;
+import javax.xml.bind.annotation.XmlAttribute;
+import javax.xml.bind.annotation.XmlRootElement;
 
-import org.drools.compiler.kie.builder.impl.InternalKieContainer;
-import org.kie.api.runtime.KieContainer;
-import org.kie.server.api.entity.KieContainerInfo;
-
-public class KieContainerInfoImpl implements KieContainerInfo {
+@XmlRootElement(name="kie-container-info")
+public class KieContainerInfo {
+    
+    public enum Status {
+        STARTED, RUNNING, FAILED
+    }
 
     private String       containerId;
     private Status       status;
-    @XmlTransient
-    private InternalKieContainer kieContainer;
 
-    public KieContainerInfoImpl() {
-        super();
+    public KieContainerInfo() {
     }
 
-    public KieContainerInfoImpl(String containerId, KieContainerInfo.Status status) {
-        this( containerId, status, null);
-    }
-    
-    public KieContainerInfoImpl(String containerId, KieContainerInfo.Status status, InternalKieContainer kieContainer) {
-        super();
+    public KieContainerInfo(String containerId, KieContainerInfo.Status status) {
         this.containerId = containerId;
         this.status = status;
-        this.kieContainer = kieContainer;
     }
 
-    /* (non-Javadoc)
-     * @see org.kie.server.api.KieContainerInfo#getContainerId()
-     */
-    @Override
+    @XmlAttribute(name="container-id")
     public String getContainerId() {
         return containerId;
     }
@@ -40,19 +30,7 @@ public class KieContainerInfoImpl implements KieContainerInfo {
         this.containerId = containerId;
     }
 
-    @XmlTransient
-    public InternalKieContainer getKieContainer() {
-        return kieContainer;
-    }
-
-    public void setKieContainer(InternalKieContainer kieContainer) {
-        this.kieContainer = kieContainer;
-    }
-
-    /* (non-Javadoc)
-     * @see org.kie.server.api.KieContainerInfo#getStatus()
-     */
-    @Override
+    @XmlAttribute(name="status")
     public Status getStatus() {
         return status;
     }
@@ -66,6 +44,7 @@ public class KieContainerInfoImpl implements KieContainerInfo {
         final int prime = 31;
         int result = 1;
         result = prime * result + ((containerId == null) ? 0 : containerId.hashCode());
+        result = prime * result + ((status == null) ? 0 : status.hashCode());
         return result;
     }
 
@@ -77,11 +56,13 @@ public class KieContainerInfoImpl implements KieContainerInfo {
             return false;
         if (getClass() != obj.getClass())
             return false;
-        KieContainerInfoImpl other = (KieContainerInfoImpl) obj;
+        KieContainerInfo other = (KieContainerInfo) obj;
         if (containerId == null) {
             if (other.containerId != null)
                 return false;
         } else if (!containerId.equals(other.containerId))
+            return false;
+        if (status != other.status)
             return false;
         return true;
     }
@@ -90,5 +71,4 @@ public class KieContainerInfoImpl implements KieContainerInfo {
     public String toString() {
         return "ContainerInfo [containerId=" + containerId + ", status=" + status + "]";
     }
-
 }

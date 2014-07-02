@@ -4,7 +4,7 @@ import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlRootElement;
 
-import org.kie.server.api.entity.KieServerCommand;
+import org.kie.server.api.model.KieServerCommand;
 
 @XmlRootElement(name="list-containers")
 @XmlAccessorType(XmlAccessType.NONE)

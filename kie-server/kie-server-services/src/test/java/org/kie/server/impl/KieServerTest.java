@@ -38,13 +38,15 @@ import org.kie.api.command.KieCommands;
 import org.kie.api.runtime.ExecutionResults;
 import org.kie.internal.runtime.helper.BatchExecutionHelper;
 import org.kie.scanner.MavenRepository;
+import org.kie.server.api.KieServerEnvironment;
 import org.kie.server.api.commands.CallContainerCommand;
 import org.kie.server.api.commands.CommandScript;
 import org.kie.server.api.commands.CreateContainerCommand;
 import org.kie.server.api.commands.DisposeContainerCommand;
-import org.kie.server.api.entity.KieServerCommand;
-import org.kie.server.api.entity.ReleaseId;
-import org.kie.server.api.entity.ServiceResponse;
+import org.kie.server.api.model.KieServerCommand;
+import org.kie.server.api.model.KieServerInfo;
+import org.kie.server.api.model.ReleaseId;
+import org.kie.server.api.model.ServiceResponse;
 import org.kie.server.services.impl.KieServerImpl;
 
 import com.thoughtworks.xstream.XStream;
@@ -77,6 +79,17 @@ public class KieServerTest {
     @After
     public void tearDown() {
         server.stop();
+    }
+
+    @Test
+    public void testGetServerInfo() throws Exception {
+        ClientResponse<ServiceResponse> response = getServerInfo();
+        
+        ServiceResponse reply = response.getEntity();
+        Assert.assertEquals(ServiceResponse.ResponseType.SUCCESS, reply.getType());
+        KieServerInfo info = (KieServerInfo) reply.getResult();
+        Assert.assertEquals(KieServerEnvironment.getVersion().toString(), info.getVersion());
+        System.out.println(reply.getResult());
     }
 
     @Test
@@ -156,8 +169,6 @@ public class KieServerTest {
         ExecutionResults results = (ExecutionResults) xs.fromXML((String) reply.getResult());
         Object value = results.getValue("message");
         Assert.assertEquals("echo:HelloWorld", getter.invoke(value));
-
-        cl.close();
     }
 
     @Test
@@ -207,6 +218,13 @@ public class KieServerTest {
 
         ServiceResponse reply = executeCommands("kie1", payload);
         Assert.assertEquals(ServiceResponse.ResponseType.FAILURE, reply.getType());
+    }
+
+    private ClientResponse<ServiceResponse> getServerInfo() throws Exception {
+        ClientRequest clientRequest = new ClientRequest(BASE_URI);
+        ClientResponse<ServiceResponse> response = clientRequest.get(ServiceResponse.class);
+        Assert.assertEquals(Response.Status.OK.getStatusCode(), response.getStatus());
+        return response;
     }
 
     private ClientResponse<ServiceResponse> createContainer(String id) throws Exception {

@@ -6,7 +6,7 @@ import javax.xml.bind.annotation.XmlAttribute;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlRootElement;
 
-import org.kie.server.api.entity.KieServerCommand;
+import org.kie.server.api.model.KieServerCommand;
 
 @XmlRootElement(name = "call-container")
 @XmlAccessorType(XmlAccessType.NONE)

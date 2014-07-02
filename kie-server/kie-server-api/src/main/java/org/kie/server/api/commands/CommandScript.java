@@ -28,7 +28,7 @@ import javax.xml.bind.annotation.XmlElements;
 import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.XmlType;
 
-import org.kie.server.api.entity.KieServerCommand;
+import org.kie.server.api.model.KieServerCommand;
 
 @XmlRootElement(name = "script")
 @XmlAccessorType(XmlAccessType.FIELD)

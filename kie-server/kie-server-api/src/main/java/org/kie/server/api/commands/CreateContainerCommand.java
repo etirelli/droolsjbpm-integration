@@ -6,8 +6,8 @@ import javax.xml.bind.annotation.XmlAttribute;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlRootElement;
 
-import org.kie.server.api.entity.KieServerCommand;
-import org.kie.server.api.entity.ReleaseId;
+import org.kie.server.api.model.KieServerCommand;
+import org.kie.server.api.model.ReleaseId;
 
 @XmlRootElement(name="create-container")
 @XmlAccessorType(XmlAccessType.NONE)

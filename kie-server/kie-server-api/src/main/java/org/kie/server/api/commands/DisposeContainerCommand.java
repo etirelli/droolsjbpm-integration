@@ -5,7 +5,7 @@ import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlAttribute;
 import javax.xml.bind.annotation.XmlRootElement;
 
-import org.kie.server.api.entity.KieServerCommand;
+import org.kie.server.api.model.KieServerCommand;
 
 @XmlRootElement(name="dispose-container")
 @XmlAccessorType(XmlAccessType.NONE)

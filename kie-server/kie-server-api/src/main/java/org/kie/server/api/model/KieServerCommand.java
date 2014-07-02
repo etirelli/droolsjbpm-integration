@@ -1,4 +1,4 @@
-package org.kie.server.api.entity;
+package org.kie.server.api.model;
 
 import javax.xml.bind.annotation.XmlRootElement;
 

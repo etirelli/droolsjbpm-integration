@@ -1,4 +1,4 @@
-package org.kie.server.api.entity;
+package org.kie.server.api.model;
 
 import java.util.List;
 
@@ -21,10 +21,13 @@ public class ServiceResponse {
     @XmlAttribute
     private String msg;
     @XmlElements({
-        @XmlElement(name = "container", type = KieContainerInfo.class),
+        @XmlElement(name = "container", type = KieContainerInfo.class)
     })
     private List<KieContainerInfo> containers;
-    @XmlElement
+    @XmlElements({
+        @XmlElement(name = "kie-server-info", type = KieServerInfo.class),
+        @XmlElement(name = "results", type = String.class)
+    })
     private Object result;
     
     
