@@ -200,8 +200,6 @@ public class KieServerTest {
         for (ServiceResponse r : reply) {
             Assert.assertEquals(ServiceResponse.ResponseType.SUCCESS, r.getType());
         }
-
-        cl.close();
     }
 
     @Test

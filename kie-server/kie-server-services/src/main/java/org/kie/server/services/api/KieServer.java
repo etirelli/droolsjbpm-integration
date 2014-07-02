@@ -22,30 +22,30 @@ public interface KieServer {
     public Response getInfo();
     
     @POST
-    @Consumes("application/xml")
-    @Produces("application/xml")
+    @Consumes(MediaType.APPLICATION_XML)
+    @Produces(MediaType.APPLICATION_XML)
     public Response execute( CommandScript command );
     
     @GET
     @Path("containers")
-    @Produces("application/xml")
+    @Produces(MediaType.APPLICATION_XML)
     public Response listContainers();
     
     @PUT
     @Path("containers/{id}")
-    @Consumes("application/xml")
-    @Produces("application/xml")
+    @Consumes(MediaType.APPLICATION_XML)
+    @Produces(MediaType.APPLICATION_XML)
     public Response createContainer( @PathParam("id") String id, ReleaseId releaseId );
     
     @DELETE
     @Path("containers/{id}")
-    @Produces("application/xml")
+    @Produces(MediaType.APPLICATION_XML)
     public Response disposeContainer( @PathParam("id") String id );
     
     @POST
     @Path("containers/{id}")
-    @Consumes("application/xml")
-    @Produces("application/xml")
+    @Consumes(MediaType.APPLICATION_XML)
+    @Produces(MediaType.APPLICATION_XML)
     public Response execute( @PathParam("id") String id, String cmdPayload );
     
 } 
