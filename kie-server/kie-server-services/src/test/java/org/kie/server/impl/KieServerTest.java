@@ -13,16 +13,10 @@ import java.net.URLClassLoader;
 import java.util.Arrays;
 import java.util.List;
 
-import javax.ws.rs.core.MediaType;
-import javax.ws.rs.core.Response;
-
 import org.drools.compiler.kie.builder.impl.InternalKieModule;
-import org.jboss.resteasy.client.ClientRequest;
-import org.jboss.resteasy.client.ClientResponse;
 import org.jboss.resteasy.plugins.providers.RegisterBuiltin;
 import org.jboss.resteasy.plugins.server.tjws.TJWSEmbeddedJaxrsServer;
 import org.jboss.resteasy.spi.ResteasyProviderFactory;
-import org.jboss.resteasy.util.GenericType;
 import org.junit.After;
 import org.junit.AfterClass;
 import org.junit.Assert;
@@ -47,23 +41,24 @@ import org.kie.server.api.model.KieServerCommand;
 import org.kie.server.api.model.KieServerInfo;
 import org.kie.server.api.model.ReleaseId;
 import org.kie.server.api.model.ServiceResponse;
+import org.kie.server.client.KieServicesClient;
 import org.kie.server.services.impl.KieServerImpl;
 
 import com.thoughtworks.xstream.XStream;
 
 public class KieServerTest {
 
-    private static final int       PORT         = 8756;
-    private static final String    BASE_URI = "http://localhost:"+PORT+"/server";
-    private static MavenRepository repository;
-    private static ReleaseId       releaseId;
+    private static final int        PORT = 8756;
+    private static MavenRepository  repository;
+    private static ReleaseId        releaseId;
     private TJWSEmbeddedJaxrsServer server;
+    private KieServicesClient       client;
 
     @BeforeClass
     public static void initialize() throws Exception {
         createAndDeployKJar();
         // this initialization only needs to be done once per VM
-        RegisterBuiltin.register(ResteasyProviderFactory.getInstance());        
+        RegisterBuiltin.register(ResteasyProviderFactory.getInstance());
     }
 
     @AfterClass
@@ -73,7 +68,7 @@ public class KieServerTest {
     @Before
     public void setup() throws Exception {
         startServer();
-        //startClient();
+        startClient();
     }
 
     @After
@@ -83,9 +78,7 @@ public class KieServerTest {
 
     @Test
     public void testGetServerInfo() throws Exception {
-        ClientResponse<ServiceResponse> response = getServerInfo();
-        
-        ServiceResponse reply = response.getEntity();
+        ServiceResponse reply = client.getServerInfo();
         Assert.assertEquals(ServiceResponse.ResponseType.SUCCESS, reply.getType());
         KieServerInfo info = (KieServerInfo) reply.getResult();
         Assert.assertEquals(KieServerEnvironment.getVersion().toString(), info.getVersion());
@@ -94,39 +87,29 @@ public class KieServerTest {
 
     @Test
     public void testCreateContainer() throws Exception {
-        ClientResponse<ServiceResponse> response = createContainer("kie1");
-        
-        ServiceResponse reply = response.getEntity();
+        ServiceResponse reply = client.createContainer("kie1", releaseId);
         Assert.assertEquals(ServiceResponse.ResponseType.SUCCESS, reply.getType());
     }
 
     @Test
-    public void testListContainers() throws Exception{
-        createContainer("kie1");
-        createContainer("kie2");
-
-        ClientRequest clientRequest = new ClientRequest(BASE_URI+"/containers");
-        ClientResponse<ServiceResponse> response = clientRequest.get(ServiceResponse.class);
-        Assert.assertEquals(Response.Status.OK.getStatusCode(), response.getStatus());
-        ServiceResponse reply = response.getEntity();
+    public void testListContainers() throws Exception {
+        client.createContainer("kie1", releaseId);
+        client.createContainer("kie2", releaseId);
+        ServiceResponse reply = client.listContainers();
         Assert.assertEquals(ServiceResponse.ResponseType.SUCCESS, reply.getType());
         Assert.assertEquals(2, reply.getContainers().size());
     }
 
     @Test
-    public void testDisposeContainer() throws Exception{
-        createContainer("kie1");
-
-        ClientRequest clientRequest = new ClientRequest(BASE_URI+"/containers/kie1");
-        ClientResponse<ServiceResponse> response = clientRequest.delete(ServiceResponse.class);
-        Assert.assertEquals(Response.Status.OK.getStatusCode(), response.getStatus());
-        ServiceResponse reply = response.getEntity();
+    public void testDisposeContainer() throws Exception {
+        client.createContainer("kie1", releaseId);
+        ServiceResponse reply = client.disposeContainer("kie1");
         Assert.assertEquals(ServiceResponse.ResponseType.SUCCESS, reply.getType());
     }
 
     @Test
     public void testCallContainer() throws Exception {
-        createContainer("kie1");
+        client.createContainer("kie1", releaseId);
 
         String payload = "<batch-execution lookup=\"defaultKieSession\">\n" +
                 "  <insert out-identifier=\"message\">\n" +
@@ -137,13 +120,13 @@ public class KieServerTest {
                 "  <fire-all-rules/>\n" +
                 "</batch-execution>";
 
-        ServiceResponse reply = executeCommands("kie1", payload);
+        ServiceResponse reply = client.executeCommands("kie1", payload);
         Assert.assertEquals(ServiceResponse.ResponseType.SUCCESS, reply.getType());
     }
 
     @Test
     public void testCallContainerMarshallCommands() throws Exception {
-        createContainer("kie1");
+        client.createContainer("kie1", releaseId);
 
         KieServices ks = KieServices.Factory.get();
         File jar = MavenRepository.getMavenRepository().resolveArtifact(releaseId).getFile();
@@ -161,7 +144,7 @@ public class KieServerTest {
 
         String payload = BatchExecutionHelper.newXStreamMarshaller().toXML(batch);
 
-        ServiceResponse reply = executeCommands("kie1", payload);
+        ServiceResponse reply = client.executeCommands("kie1", payload);
         Assert.assertEquals(ServiceResponse.ResponseType.SUCCESS, reply.getType());
 
         XStream xs = BatchExecutionHelper.newXStreamMarshaller();
@@ -195,7 +178,7 @@ public class KieServerTest {
         List<KieServerCommand> cmds = Arrays.asList(create, call, dispose);
         CommandScript script = new CommandScript(cmds);
 
-        List<ServiceResponse> reply = executeScript(script);
+        List<ServiceResponse> reply = client.executeScript(script);
 
         for (ServiceResponse r : reply) {
             Assert.assertEquals(ServiceResponse.ResponseType.SUCCESS, r.getType());
@@ -204,7 +187,7 @@ public class KieServerTest {
 
     @Test
     public void testCallContainerLookupError() throws Exception {
-        createContainer("kie1");
+        client.createContainer("kie1", releaseId);
 
         String payload = "<batch-execution lookup=\"xyz\">\n" +
                 "  <insert out-identifier=\"message\">\n" +
@@ -214,38 +197,8 @@ public class KieServerTest {
                 "  </insert>\n" +
                 "</batch-execution>";
 
-        ServiceResponse reply = executeCommands("kie1", payload);
+        ServiceResponse reply = client.executeCommands("kie1", payload);
         Assert.assertEquals(ServiceResponse.ResponseType.FAILURE, reply.getType());
-    }
-
-    private ClientResponse<ServiceResponse> getServerInfo() throws Exception {
-        ClientRequest clientRequest = new ClientRequest(BASE_URI);
-        ClientResponse<ServiceResponse> response = clientRequest.get(ServiceResponse.class);
-        Assert.assertEquals(Response.Status.OK.getStatusCode(), response.getStatus());
-        return response;
-    }
-
-    private ClientResponse<ServiceResponse> createContainer(String id) throws Exception {
-        ClientRequest clientRequest = new ClientRequest(BASE_URI+"/containers/"+id);
-        ClientResponse<ServiceResponse> response = clientRequest.body(MediaType.APPLICATION_XML_TYPE, releaseId).put(ServiceResponse.class);
-        Assert.assertEquals(Response.Status.CREATED.getStatusCode(), response.getStatus());
-        return response;
-    }
-
-    private ServiceResponse executeCommands(String id, String payload) throws Exception {
-        ClientRequest clientRequest = new ClientRequest(BASE_URI+"/containers/"+id);
-        ClientResponse<ServiceResponse> response = clientRequest.body(MediaType.APPLICATION_XML_TYPE, payload).post(ServiceResponse.class);
-        Assert.assertEquals(Response.Status.OK.getStatusCode(), response.getStatus());
-        ServiceResponse reply = response.getEntity();
-        return reply;
-    }
-
-    private List<ServiceResponse> executeScript(CommandScript script) throws Exception {
-        ClientRequest clientRequest = new ClientRequest(BASE_URI);
-        ClientResponse<List<ServiceResponse>> response = clientRequest.body(MediaType.APPLICATION_XML_TYPE, script).post(new GenericType<List<ServiceResponse>>() {});
-        Assert.assertEquals(Response.Status.OK.getStatusCode(), response.getStatus());
-        List<ServiceResponse> reply = response.getEntity();
-        return reply;
     }
 
     public static byte[] createAndDeployJar(KieServices ks,
@@ -285,6 +238,10 @@ public class KieServerTest {
         server.setPort(PORT);
         server.start();
         server.getDeployment().getRegistry().addSingletonResource(new KieServerImpl());
+    }
+
+    private void startClient() throws Exception {
+        client = new KieServicesClient("http://localhost:" + PORT + "/server");
     }
 
     private static void createAndDeployKJar() {
