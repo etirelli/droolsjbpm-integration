@@ -37,6 +37,8 @@ import org.kie.server.api.commands.CallContainerCommand;
 import org.kie.server.api.commands.CommandScript;
 import org.kie.server.api.commands.CreateContainerCommand;
 import org.kie.server.api.commands.DisposeContainerCommand;
+import org.kie.server.api.model.KieContainerInfo;
+import org.kie.server.api.model.KieContainerInfoList;
 import org.kie.server.api.model.KieServerCommand;
 import org.kie.server.api.model.KieServerInfo;
 import org.kie.server.api.model.ReleaseId;
@@ -78,32 +80,48 @@ public class KieServerTest {
 
     @Test
     public void testGetServerInfo() throws Exception {
-        ServiceResponse reply = client.getServerInfo();
+        ServiceResponse<KieServerInfo> reply = client.getServerInfo();
         Assert.assertEquals(ServiceResponse.ResponseType.SUCCESS, reply.getType());
-        KieServerInfo info = (KieServerInfo) reply.getResult();
+        KieServerInfo info = reply.getResult();
         Assert.assertEquals(KieServerEnvironment.getVersion().toString(), info.getVersion());
         System.out.println(reply.getResult());
     }
 
     @Test
     public void testCreateContainer() throws Exception {
-        ServiceResponse reply = client.createContainer("kie1", releaseId);
+        ServiceResponse<KieContainerInfo> reply = client.createContainer("kie1", releaseId);
         Assert.assertEquals(ServiceResponse.ResponseType.SUCCESS, reply.getType());
+    }
+
+    @Test
+    public void testGetContainerInfo() throws Exception {
+        client.createContainer("kie1", releaseId);
+        ServiceResponse<KieContainerInfo> reply = client.getContainerInfo("kie1");
+        Assert.assertEquals(ServiceResponse.ResponseType.SUCCESS, reply.getType());
+        
+        KieContainerInfo info = reply.getResult();
+        Assert.assertEquals( KieContainerInfo.Status.STARTED, info.getStatus() );
+    }
+
+    @Test
+    public void testGetContainerInfoNonExisting() throws Exception {
+        ServiceResponse<KieContainerInfo> reply = client.getContainerInfo("kie1");
+        Assert.assertEquals(ServiceResponse.ResponseType.FAILURE, reply.getType());
     }
 
     @Test
     public void testListContainers() throws Exception {
         client.createContainer("kie1", releaseId);
         client.createContainer("kie2", releaseId);
-        ServiceResponse reply = client.listContainers();
+        ServiceResponse<KieContainerInfoList> reply = client.listContainers();
         Assert.assertEquals(ServiceResponse.ResponseType.SUCCESS, reply.getType());
-        Assert.assertEquals(2, reply.getContainers().size());
+        Assert.assertEquals(2, reply.getResult().getContainers().size());
     }
 
     @Test
     public void testDisposeContainer() throws Exception {
         client.createContainer("kie1", releaseId);
-        ServiceResponse reply = client.disposeContainer("kie1");
+        ServiceResponse<Void> reply = client.disposeContainer("kie1");
         Assert.assertEquals(ServiceResponse.ResponseType.SUCCESS, reply.getType());
     }
 
@@ -120,7 +138,7 @@ public class KieServerTest {
                 "  <fire-all-rules/>\n" +
                 "</batch-execution>";
 
-        ServiceResponse reply = client.executeCommands("kie1", payload);
+        ServiceResponse<String> reply = client.executeCommands("kie1", payload);
         Assert.assertEquals(ServiceResponse.ResponseType.SUCCESS, reply.getType());
     }
 
@@ -144,12 +162,12 @@ public class KieServerTest {
 
         String payload = BatchExecutionHelper.newXStreamMarshaller().toXML(batch);
 
-        ServiceResponse reply = client.executeCommands("kie1", payload);
+        ServiceResponse<String> reply = client.executeCommands("kie1", payload);
         Assert.assertEquals(ServiceResponse.ResponseType.SUCCESS, reply.getType());
 
         XStream xs = BatchExecutionHelper.newXStreamMarshaller();
         xs.setClassLoader(cl);
-        ExecutionResults results = (ExecutionResults) xs.fromXML((String) reply.getResult());
+        ExecutionResults results = (ExecutionResults) xs.fromXML(reply.getResult());
         Object value = results.getValue("message");
         Assert.assertEquals("echo:HelloWorld", getter.invoke(value));
     }
@@ -178,9 +196,9 @@ public class KieServerTest {
         List<KieServerCommand> cmds = Arrays.asList(create, call, dispose);
         CommandScript script = new CommandScript(cmds);
 
-        List<ServiceResponse> reply = client.executeScript(script);
+        List<ServiceResponse<? extends Object>> reply = client.executeScript(script);
 
-        for (ServiceResponse r : reply) {
+        for (ServiceResponse<? extends Object> r : reply) {
             Assert.assertEquals(ServiceResponse.ResponseType.SUCCESS, r.getType());
         }
     }
@@ -197,7 +215,7 @@ public class KieServerTest {
                 "  </insert>\n" +
                 "</batch-execution>";
 
-        ServiceResponse reply = client.executeCommands("kie1", payload);
+        ServiceResponse<String> reply = client.executeCommands("kie1", payload);
         Assert.assertEquals(ServiceResponse.ResponseType.FAILURE, reply.getType());
     }
 

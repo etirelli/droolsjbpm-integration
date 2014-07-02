@@ -10,6 +10,9 @@ import org.jboss.resteasy.client.ClientResponse;
 import org.jboss.resteasy.client.ClientResponseFailure;
 import org.jboss.resteasy.util.GenericType;
 import org.kie.server.api.commands.CommandScript;
+import org.kie.server.api.model.KieContainerInfo;
+import org.kie.server.api.model.KieContainerInfoList;
+import org.kie.server.api.model.KieServerInfo;
 import org.kie.server.api.model.ReleaseId;
 import org.kie.server.api.model.ServiceResponse;
 
@@ -22,11 +25,11 @@ public class KieServicesClient {
         this.baseURI = baseURI;
     }
 
-    public ServiceResponse getServerInfo() throws ClientResponseFailure {
-        ClientResponse<ServiceResponse> response = null;
+    public ServiceResponse<KieServerInfo> getServerInfo() throws ClientResponseFailure {
+        ClientResponse<ServiceResponse<KieServerInfo>> response = null;
         try {
             ClientRequest clientRequest = new ClientRequest(baseURI);
-            response = clientRequest.get(ServiceResponse.class);
+            response = clientRequest.get(new GenericType<ServiceResponse<KieServerInfo>>(){});
             if( response.getStatus() == Response.Status.OK.getStatusCode() ) {
                 return response.getEntity();
             }
@@ -36,11 +39,11 @@ public class KieServicesClient {
         }
     }
 
-    public ServiceResponse listContainers() throws ClientResponseFailure {
-        ClientResponse<ServiceResponse> response = null;
+    public ServiceResponse<KieContainerInfoList> listContainers() throws ClientResponseFailure {
+        ClientResponse<ServiceResponse<KieContainerInfoList>> response = null;
         try {
             ClientRequest clientRequest = new ClientRequest(baseURI+"/containers");
-            response = clientRequest.get(ServiceResponse.class);
+            response = clientRequest.get(new GenericType<ServiceResponse<KieContainerInfoList>>(){});
             if( response.getStatus() == Response.Status.OK.getStatusCode() ) {
                 return response.getEntity();
             }
@@ -50,11 +53,11 @@ public class KieServicesClient {
         }
     }
 
-    public ServiceResponse createContainer(String id, ReleaseId releaseId) throws ClientResponseFailure {
-        ClientResponse<ServiceResponse> response = null;
+    public ServiceResponse<KieContainerInfo> createContainer(String id, ReleaseId releaseId) throws ClientResponseFailure {
+        ClientResponse<ServiceResponse<KieContainerInfo>> response = null;
         try {
             ClientRequest clientRequest = new ClientRequest(baseURI+"/containers/"+id);
-            response = clientRequest.body(MediaType.APPLICATION_XML_TYPE, releaseId).put(ServiceResponse.class);
+            response = clientRequest.body(MediaType.APPLICATION_XML_TYPE, releaseId).put(new GenericType<ServiceResponse<KieContainerInfo>>(){});
             if( response.getStatus() == Response.Status.CREATED.getStatusCode() ) {
                 return response.getEntity();
             }
@@ -64,11 +67,25 @@ public class KieServicesClient {
         }
     }
 
-    public ServiceResponse disposeContainer(String id) throws ClientResponseFailure {
-        ClientResponse<ServiceResponse> response = null;
+    public ServiceResponse<KieContainerInfo> getContainerInfo(String id) throws ClientResponseFailure {
+        ClientResponse<ServiceResponse<KieContainerInfo>> response = null;
         try {
             ClientRequest clientRequest = new ClientRequest(baseURI+"/containers/"+id);
-            response = clientRequest.delete(ServiceResponse.class);
+            response = clientRequest.get(new GenericType<ServiceResponse<KieContainerInfo>>(){});
+            if( response.getStatus() == Response.Status.OK.getStatusCode() ) {
+                return response.getEntity();
+            }
+            throw new ClientResponseFailure("Unexpected response code: "+response.getStatus(), response );
+        } catch (Exception e) {
+            throw new ClientResponseFailure("Unexpected exception retrieving container info.", e, response );
+        }
+    }
+
+    public ServiceResponse<Void> disposeContainer(String id) throws ClientResponseFailure {
+        ClientResponse<ServiceResponse<Void>> response = null;
+        try {
+            ClientRequest clientRequest = new ClientRequest(baseURI+"/containers/"+id);
+            response = clientRequest.delete(new GenericType<ServiceResponse<Void>>(){});
             if( response.getStatus() == Response.Status.OK.getStatusCode() ) {
                 return response.getEntity();
             }
@@ -78,11 +95,11 @@ public class KieServicesClient {
         }
     }
 
-    public ServiceResponse executeCommands(String id, String payload) throws ClientResponseFailure {
-        ClientResponse<ServiceResponse> response = null;
+    public ServiceResponse<String> executeCommands(String id, String payload) throws ClientResponseFailure {
+        ClientResponse<ServiceResponse<String>> response = null;
         try {
             ClientRequest clientRequest = new ClientRequest(baseURI+"/containers/"+id);
-            response = clientRequest.body(MediaType.APPLICATION_XML_TYPE, payload).post(ServiceResponse.class);
+            response = clientRequest.body(MediaType.APPLICATION_XML_TYPE, payload).post(new GenericType<ServiceResponse<String>>(){});
             if( response.getStatus() == Response.Status.OK.getStatusCode() ) {
                 return response.getEntity();
             }
@@ -92,11 +109,11 @@ public class KieServicesClient {
         }
     }
 
-    public List<ServiceResponse> executeScript(CommandScript script) throws ClientResponseFailure {
-        ClientResponse<List<ServiceResponse>> response = null;
+    public List<ServiceResponse<? extends Object>> executeScript(CommandScript script) throws ClientResponseFailure {
+        ClientResponse<List<ServiceResponse<? extends Object>>> response = null;
         try {
             ClientRequest clientRequest = new ClientRequest(baseURI);
-            response = clientRequest.body(MediaType.APPLICATION_XML_TYPE, script).post(new GenericType<List<ServiceResponse>>() {});
+            response = clientRequest.body(MediaType.APPLICATION_XML_TYPE, script).post(new GenericType<List<ServiceResponse<? extends Object>>>() {});
             if( response.getStatus() == Response.Status.OK.getStatusCode() ) {
                 return response.getEntity();
             }

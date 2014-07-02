@@ -27,6 +27,7 @@ import org.kie.server.api.commands.CreateContainerCommand;
 import org.kie.server.api.commands.DisposeContainerCommand;
 import org.kie.server.api.commands.ListContainersCommand;
 import org.kie.server.api.model.KieContainerInfo;
+import org.kie.server.api.model.KieContainerInfoList;
 import org.kie.server.api.model.KieServerCommand;
 import org.kie.server.api.model.KieServerInfo;
 import org.kie.server.api.model.ReleaseId;
@@ -55,7 +56,7 @@ public class KieServerImpl implements KieServer {
 
     @Override
     public Response execute(CommandScript command) {
-        return Response.ok(new GenericEntity<List<ServiceResponse>>(executeScript(context, command)){}).build();
+        return Response.ok(new GenericEntity<List<ServiceResponse<? extends Object>>>(executeScript(context, command)){}).build();
     }
     
     @Override
@@ -69,6 +70,11 @@ public class KieServerImpl implements KieServer {
     }
     
     @Override
+    public Response getContainerInfo(String id) {
+        return Response.ok(getContainerInfo(context, id)).build();
+    }
+    
+    @Override
     public Response disposeContainer(String id) {
         return Response.ok(disposeContainer(context, id)).build();
     }
@@ -78,8 +84,8 @@ public class KieServerImpl implements KieServer {
         return Response.ok(callContainer(context, id, cmdPayload)).build();
     }
     
-    private List<ServiceResponse> executeScript(KieServerCommandContext context, CommandScript commands) {
-        List<ServiceResponse> response = new ArrayList<ServiceResponse>();
+    private List<ServiceResponse<? extends Object>> executeScript(KieServerCommandContext context, CommandScript commands) {
+        List<ServiceResponse<? extends Object>> response = new ArrayList<ServiceResponse<? extends Object>>();
         for (KieServerCommand command : commands.getCommands()) {
             if( command instanceof CreateContainerCommand ) {
                 response.add(createContainer(context, ((CreateContainerCommand) command).getContainerId(), ((CreateContainerCommand) command).getReleaseId()));
@@ -94,50 +100,64 @@ public class KieServerImpl implements KieServer {
         return response;
     }
     
-    private ServiceResponse getInfo(KieServerCommandContext context) {
+    private ServiceResponse<KieServerInfo> getInfo(KieServerCommandContext context) {
         try {
-            return new ServiceResponse(ServiceResponse.ResponseType.SUCCESS, "Kie Server info", new KieServerInfo(KieServerEnvironment.getVersion().toString()) );
+            return new ServiceResponse<KieServerInfo>(ServiceResponse.ResponseType.SUCCESS, "Kie Server info", new KieServerInfo(KieServerEnvironment.getVersion().toString()) );
         } catch (Exception e) {
-            return new ServiceResponse(ServiceResponse.ResponseType.FAILURE, "Error retrieving kie server info: "+
+            return new ServiceResponse<KieServerInfo>(ServiceResponse.ResponseType.FAILURE, "Error retrieving kie server info: "+
                     e.getClass().getName()+": "+e.getMessage());
         }
     }
     
-    private ServiceResponse createContainer(KieServerCommandContext context, String containerId, ReleaseId releaseId) {
+    private ServiceResponse<KieContainerInfo> createContainer(KieServerCommandContext context, String containerId, ReleaseId releaseId) {
         try {
             if( ! context.getContainers().containsKey(containerId) ) {
                 KieServices ks = KieServices.Factory.get();
                 InternalKieContainer kieContainer = (InternalKieContainer) ks.newKieContainer(releaseId);
                 if( kieContainer != null ) {
-                    context.getContainers().put(containerId, new KieContainerInstance(containerId, KieContainerInfo.Status.STARTED, kieContainer));
-                    return new ServiceResponse(ServiceResponse.ResponseType.SUCCESS, "Container "+containerId+" successfully deployed with module "+releaseId+".");
+                    KieContainerInstance ci = new KieContainerInstance(containerId, KieContainerInfo.Status.STARTED, kieContainer);
+                    context.getContainers().put(containerId, ci);
+                    return new ServiceResponse<KieContainerInfo>(ServiceResponse.ResponseType.SUCCESS, "Container "+containerId+" successfully deployed with module "+releaseId+".", ci.getInfo());
                 } else {
-                    return new ServiceResponse(ServiceResponse.ResponseType.FAILURE, "Failed to create container "+containerId+" with module "+releaseId+".");
+                    return new ServiceResponse<KieContainerInfo>(ServiceResponse.ResponseType.FAILURE, "Failed to create container "+containerId+" with module "+releaseId+".");
                 }        
             } else {
-                return new ServiceResponse(ServiceResponse.ResponseType.FAILURE, "Container "+containerId+" already exists.");
+                return new ServiceResponse<KieContainerInfo>(ServiceResponse.ResponseType.FAILURE, "Container "+containerId+" already exists.", context.getContainers().get(containerId).getInfo());
             }
         } catch (Exception e) {
-            return new ServiceResponse(ServiceResponse.ResponseType.FAILURE, "Error creating container "+containerId+
+            return new ServiceResponse<KieContainerInfo>(ServiceResponse.ResponseType.FAILURE, "Error creating container "+containerId+
                     " with module "+releaseId+": "+e.getClass().getName()+": "+e.getMessage());
         }
     }
     
-    private ServiceResponse listContainers(KieServerCommandContext context) {
+    private ServiceResponse<KieContainerInfoList> listContainers(KieServerCommandContext context) {
         try {
             List<KieContainerInfo> containers = new ArrayList<KieContainerInfo>();
             for( KieContainerInstance instance : context.getContainers().values() ) {
                 containers.add(instance.getInfo() );
             }
-            return new ServiceResponse(ServiceResponse.ResponseType.SUCCESS, "List of created containers", containers );
+            KieContainerInfoList cil = new KieContainerInfoList(containers);
+            return new ServiceResponse<KieContainerInfoList>(ServiceResponse.ResponseType.SUCCESS, "List of created containers", cil );
         } catch (Exception e) {
-            return new ServiceResponse(ServiceResponse.ResponseType.FAILURE, "Error listing containers: "+
+            return new ServiceResponse<KieContainerInfoList>(ServiceResponse.ResponseType.FAILURE, "Error listing containers: "+
                     e.getClass().getName()+": "+e.getMessage());
         }
     }
-    
 
-    private ServiceResponse callContainer(KieServerCommandContext context, String containerId, String payload ) {
+    private ServiceResponse<KieContainerInfo> getContainerInfo(KieServerCommandContext context, String id) {
+        try {
+            KieContainerInstance ci = context.getContainers().get(id);
+            if( ci != null ) {
+                return new ServiceResponse<KieContainerInfo>(ServiceResponse.ResponseType.SUCCESS, "Info for container "+id, ci.getInfo() );
+            }
+            return new ServiceResponse<KieContainerInfo>(ServiceResponse.ResponseType.FAILURE, "Container "+id+" is not instantiated.");
+        } catch (Exception e) {
+            return new ServiceResponse<KieContainerInfo>(ServiceResponse.ResponseType.FAILURE, "Error retrieving container info: "+
+                    e.getClass().getName()+": "+e.getMessage());
+        }
+    }
+
+    private ServiceResponse<String> callContainer(KieServerCommandContext context, String containerId, String payload ) {
         try {
             KieContainerInstance kci = (KieContainerInstance) context.getContainers().get(containerId);
             if (kci != null && kci.getKieContainer() != null) {
@@ -160,7 +180,7 @@ public class KieServerImpl implements KieServer {
                     Command<?> cmd = (Command<?>) xs.fromXML(payload);
 
                     if (cmd == null) {
-                        return new ServiceResponse(ServiceResponse.ResponseType.FAILURE, "Body of in message not of the expected type '" + Command.class.getName() + "'");
+                        return new ServiceResponse<String>(ServiceResponse.ResponseType.FAILURE, "Body of in message not of the expected type '" + Command.class.getName() + "'");
                     }
                     if (!(cmd instanceof BatchExecutionCommandImpl)) {
                         cmd = new BatchExecutionCommandImpl(Arrays.asList(new GenericCommand<?>[]{(GenericCommand<?>) cmd}));
@@ -168,30 +188,30 @@ public class KieServerImpl implements KieServer {
 
                     ExecutionResults results = ks.execute((BatchExecutionCommandImpl) cmd);
                     String result = xs.toXML(results);
-                    return new ServiceResponse(ServiceResponse.ResponseType.SUCCESS, "Container " + containerId + " successfully called.", result);
+                    return new ServiceResponse<String>(ServiceResponse.ResponseType.SUCCESS, "Container " + containerId + " successfully called.", result);
                 } else {
-                    return new ServiceResponse(ServiceResponse.ResponseType.FAILURE, "Session '" + sessionId + "' not found on container '" + containerId + "'.");
+                    return new ServiceResponse<String>(ServiceResponse.ResponseType.FAILURE, "Session '" + sessionId + "' not found on container '" + containerId + "'.");
                 }
             } else {
-                return new ServiceResponse(ServiceResponse.ResponseType.FAILURE, "Container " + containerId + " is not instantiated.");
+                return new ServiceResponse<String>(ServiceResponse.ResponseType.FAILURE, "Container " + containerId + " is not instantiated.");
             }
         } catch (Exception e) {
-            return new ServiceResponse(ServiceResponse.ResponseType.FAILURE, "Error calling container " + containerId + ": " +
+            return new ServiceResponse<String>(ServiceResponse.ResponseType.FAILURE, "Error calling container " + containerId + ": " +
                     e.getClass().getName() + ": " + e.getMessage());
         }
     }
     
-    private ServiceResponse disposeContainer(KieServerCommandContext context, String containerId ) {
+    private ServiceResponse<Void> disposeContainer(KieServerCommandContext context, String containerId ) {
         try {
             KieContainerInstance kci = (KieContainerInstance) context.getContainers().remove(containerId);
             if( kci != null && kci.getKieContainer() != null ) {
                 kci.getKieContainer().dispose();
-                return new ServiceResponse(ServiceResponse.ResponseType.SUCCESS, "Container "+containerId+" successfully disposed.");
+                return new ServiceResponse<Void>(ServiceResponse.ResponseType.SUCCESS, "Container "+containerId+" successfully disposed.");
             } else {
-                return new ServiceResponse(ServiceResponse.ResponseType.SUCCESS, "Container "+containerId+" was not instantiated.");
+                return new ServiceResponse<Void>(ServiceResponse.ResponseType.SUCCESS, "Container "+containerId+" was not instantiated.");
             }
         } catch (Exception e) {
-            return new ServiceResponse(ServiceResponse.ResponseType.FAILURE, "Error disposing container "+containerId+": "+
+            return new ServiceResponse<Void>(ServiceResponse.ResponseType.FAILURE, "Error disposing container "+containerId+": "+
                     e.getClass().getName()+": "+e.getMessage());
         }
     }

@@ -1,7 +1,5 @@
 package org.kie.server.api.model;
 
-import java.util.List;
-
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlAttribute;
@@ -11,7 +9,7 @@ import javax.xml.bind.annotation.XmlRootElement;
 
 @XmlRootElement(name="response")
 @XmlAccessorType(XmlAccessType.NONE)
-public class ServiceResponse {
+public class ServiceResponse<T> {
     public static enum ResponseType {
         SUCCESS, FAILURE;
     }
@@ -21,14 +19,12 @@ public class ServiceResponse {
     @XmlAttribute
     private String msg;
     @XmlElements({
-        @XmlElement(name = "container", type = KieContainerInfo.class)
-    })
-    private List<KieContainerInfo> containers;
-    @XmlElements({
         @XmlElement(name = "kie-server-info", type = KieServerInfo.class),
-        @XmlElement(name = "results", type = String.class)
+        @XmlElement(name = "kie-container-info", type = KieContainerInfo.class),
+        @XmlElement(name = "results", type = String.class),
+        @XmlElement(name = "kie-containers", type = KieContainerInfoList.class)
     })
-    private Object result;
+    private T result;
     
     
     public ServiceResponse() {
@@ -39,13 +35,7 @@ public class ServiceResponse {
         this.msg = msg;
     }
     
-    public ServiceResponse(ServiceResponse.ResponseType type, String msg, List<KieContainerInfo> containers) {
-        this.type = type;
-        this.msg = msg;
-        this.containers = containers;
-    }
-    
-    public ServiceResponse(ServiceResponse.ResponseType type, String msg, Object result ) {
+    public ServiceResponse(ServiceResponse.ResponseType type, String msg, T result ) {
         this.type = type;
         this.msg = msg;
         this.result = result;
@@ -67,19 +57,11 @@ public class ServiceResponse {
         this.msg = msg;
     }
     
-    public List<KieContainerInfo> getContainers() {
-        return containers;
-    }
-    
-    public void setContainers(List<KieContainerInfo> containers) {
-        this.containers = containers;
-    }
-    
-    public Object getResult() {
+    public T getResult() {
         return result;
     }
     
-    public void setResult(Object result) {
+    public void setResult(T result) {
         this.result = result;
     }
 

@@ -31,6 +31,11 @@ public interface KieServer {
     @Produces(MediaType.APPLICATION_XML)
     public Response listContainers();
     
+    @GET
+    @Path("containers/{id}")
+    @Produces(MediaType.APPLICATION_XML)
+    public Response getContainerInfo( @PathParam("id") String id );
+    
     @PUT
     @Path("containers/{id}")
     @Consumes(MediaType.APPLICATION_XML)
