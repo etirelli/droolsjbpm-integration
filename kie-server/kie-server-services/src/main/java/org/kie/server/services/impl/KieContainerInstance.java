@@ -1,29 +1,31 @@
 package org.kie.server.services.impl;
 
 import org.drools.compiler.kie.builder.impl.InternalKieContainer;
-import org.kie.server.api.model.KieContainerInfo;
+import org.kie.server.api.model.KieContainerResource;
+import org.kie.server.api.model.KieContainerStatus;
+import org.kie.server.api.model.ReleaseId;
 
 public class KieContainerInstance {
 
-    private KieContainerInfo     info;
+    private KieContainerResource resource;
     private InternalKieContainer kieContainer;
 
-    public KieContainerInstance(String containerId, KieContainerInfo.Status status) {
+    public KieContainerInstance(String containerId, KieContainerStatus status) {
         this(containerId, status, null);
     }
 
-    public KieContainerInstance(String containerId, KieContainerInfo.Status status, InternalKieContainer kieContainer) {
+    public KieContainerInstance(String containerId, KieContainerStatus status, InternalKieContainer kieContainer) {
         super();
-        this.info = new KieContainerInfo(containerId, status);
+        this.resource = new KieContainerResource(containerId, kieContainer != null ? new ReleaseId( kieContainer.getContainerReleaseId() ) : null, status);
         this.kieContainer = kieContainer;
     }
 
     public String getContainerId() {
-        return info.getContainerId();
+        return resource.getContainerId();
     }
 
     public void setContainerId(String containerId) {
-        this.info.setContainerId(containerId);
+        this.resource.setContainerId(containerId);
     }
 
     public InternalKieContainer getKieContainer() {
@@ -32,27 +34,31 @@ public class KieContainerInstance {
 
     public void setKieContainer(InternalKieContainer kieContainer) {
         this.kieContainer = kieContainer;
+        if( kieContainer != null ) {
+            this.resource.setReleaseId(new ReleaseId( kieContainer.getReleaseId()));
+            this.resource.setResolvedReleaseId(new ReleaseId(kieContainer.getContainerReleaseId()));
+        }
     }
 
-    public KieContainerInfo.Status getStatus() {
-        return info.getStatus();
+    public KieContainerStatus getStatus() {
+        return resource.getStatus();
     }
 
-    public void setStatus(KieContainerInfo.Status status) {
-        this.info.setStatus(status);
+    public void setStatus(KieContainerStatus status) {
+        this.resource.setStatus(status);
     }
 
-    public KieContainerInfo getInfo() {
-        return info;
+    public KieContainerResource getResource() {
+        return resource;
     }
 
-    public void setInfo(KieContainerInfo info) {
-        this.info = info;
+    public void setResource(KieContainerResource resource) {
+        this.resource = resource;
     }
 
     @Override
     public String toString() {
-        return info.toString();
+        return resource.toString();
     }
 
 }

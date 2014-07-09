@@ -17,6 +17,10 @@ public class ReleaseId implements org.kie.api.builder.ReleaseId {
     public ReleaseId() {
         super();
     }
+    
+    public ReleaseId( org.kie.api.builder.ReleaseId releaseId ) {
+        this( releaseId.getGroupId(), releaseId.getArtifactId(), releaseId.getVersion() );
+    }
 
     public ReleaseId(String groupId, String artifactId, String version) {
         super();

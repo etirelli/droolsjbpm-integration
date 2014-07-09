@@ -10,8 +10,8 @@ import org.jboss.resteasy.client.ClientResponse;
 import org.jboss.resteasy.client.ClientResponseFailure;
 import org.jboss.resteasy.util.GenericType;
 import org.kie.server.api.commands.CommandScript;
-import org.kie.server.api.model.KieContainerInfo;
-import org.kie.server.api.model.KieContainerInfoList;
+import org.kie.server.api.model.KieContainerResource;
+import org.kie.server.api.model.KieContainerResourceList;
 import org.kie.server.api.model.KieServerInfo;
 import org.kie.server.api.model.ReleaseId;
 import org.kie.server.api.model.ServiceResponse;
@@ -39,11 +39,11 @@ public class KieServicesClient {
         }
     }
 
-    public ServiceResponse<KieContainerInfoList> listContainers() throws ClientResponseFailure {
-        ClientResponse<ServiceResponse<KieContainerInfoList>> response = null;
+    public ServiceResponse<KieContainerResourceList> listContainers() throws ClientResponseFailure {
+        ClientResponse<ServiceResponse<KieContainerResourceList>> response = null;
         try {
             ClientRequest clientRequest = new ClientRequest(baseURI+"/containers");
-            response = clientRequest.get(new GenericType<ServiceResponse<KieContainerInfoList>>(){});
+            response = clientRequest.get(new GenericType<ServiceResponse<KieContainerResourceList>>(){});
             if( response.getStatus() == Response.Status.OK.getStatusCode() ) {
                 return response.getEntity();
             }
@@ -53,25 +53,25 @@ public class KieServicesClient {
         }
     }
 
-    public ServiceResponse<KieContainerInfo> createContainer(String id, ReleaseId releaseId) throws ClientResponseFailure {
-        ClientResponse<ServiceResponse<KieContainerInfo>> response = null;
+    public ServiceResponse<KieContainerResource> createContainer(String id, KieContainerResource resource) throws ClientResponseFailure {
+        ClientResponse<ServiceResponse<KieContainerResource>> response = null;
         try {
             ClientRequest clientRequest = new ClientRequest(baseURI+"/containers/"+id);
-            response = clientRequest.body(MediaType.APPLICATION_XML_TYPE, releaseId).put(new GenericType<ServiceResponse<KieContainerInfo>>(){});
+            response = clientRequest.body(MediaType.APPLICATION_XML_TYPE, resource).put(new GenericType<ServiceResponse<KieContainerResource>>(){});
             if( response.getStatus() == Response.Status.CREATED.getStatusCode() ) {
                 return response.getEntity();
             }
             throw new ClientResponseFailure("Unexpected response code: "+response.getStatus(), response );
         } catch (Exception e) {
-            throw new ClientResponseFailure("Unexpected exception creating container: "+id+" with release-id "+releaseId, e, response );
+            throw new ClientResponseFailure("Unexpected exception creating container: "+id+" with release-id "+resource.getReleaseId(), e, response );
         }
     }
 
-    public ServiceResponse<KieContainerInfo> getContainerInfo(String id) throws ClientResponseFailure {
-        ClientResponse<ServiceResponse<KieContainerInfo>> response = null;
+    public ServiceResponse<KieContainerResource> getContainerInfo(String id) throws ClientResponseFailure {
+        ClientResponse<ServiceResponse<KieContainerResource>> response = null;
         try {
             ClientRequest clientRequest = new ClientRequest(baseURI+"/containers/"+id);
-            response = clientRequest.get(new GenericType<ServiceResponse<KieContainerInfo>>(){});
+            response = clientRequest.get(new GenericType<ServiceResponse<KieContainerResource>>(){});
             if( response.getStatus() == Response.Status.OK.getStatusCode() ) {
                 return response.getEntity();
             }

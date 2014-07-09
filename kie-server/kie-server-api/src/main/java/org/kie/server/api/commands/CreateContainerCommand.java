@@ -2,51 +2,65 @@ package org.kie.server.api.commands;
 
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
-import javax.xml.bind.annotation.XmlAttribute;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlRootElement;
 
+import org.kie.server.api.model.KieContainerResource;
 import org.kie.server.api.model.KieServerCommand;
-import org.kie.server.api.model.ReleaseId;
 
-@XmlRootElement(name="create-container")
+@XmlRootElement(name = "create-container")
 @XmlAccessorType(XmlAccessType.NONE)
 public class CreateContainerCommand implements KieServerCommand {
-    private static final long serialVersionUID = -1803374525440238478L;
-    
-    @XmlAttribute(name="container-id")
-    private String    containerId;
-    @XmlElement(name="release-id")
-    private ReleaseId releaseId;
-    
+
+    private static final long    serialVersionUID = -1803374525440238478L;
+
+    @XmlElement
+    private KieContainerResource container;
+
     public CreateContainerCommand() {
         super();
     }
-    
-    public CreateContainerCommand(String containerId, ReleaseId releaseId) {
-        this.containerId = containerId;
-        this.releaseId = releaseId;
+
+    public CreateContainerCommand(KieContainerResource container) {
+        this.container = container;
     }
 
-    public String getContainerId() {
-        return containerId;
+    public KieContainerResource getContainer() {
+        return container;
     }
 
-    public void setContainerId(String containerId) {
-        this.containerId = containerId;
+    public void setContainer(KieContainerResource container) {
+        this.container = container;
     }
 
-    public ReleaseId getReleaseId() {
-        return releaseId;
+    @Override
+    public int hashCode() {
+        final int prime = 31;
+        int result = 1;
+        result = prime * result + ((container == null) ? 0 : container.hashCode());
+        return result;
     }
 
-    public void setReleaseId(ReleaseId releaseId) {
-        this.releaseId = releaseId;
+    @Override
+    public boolean equals(Object obj) {
+        if (this == obj)
+            return true;
+        if (obj == null)
+            return false;
+        if (getClass() != obj.getClass())
+            return false;
+        CreateContainerCommand other = (CreateContainerCommand) obj;
+        if (container == null) {
+            if (other.container != null)
+                return false;
+        } else if (!container.equals(other.container))
+            return false;
+        return true;
     }
 
     @Override
     public String toString() {
-        return "CreateContainerCommand [containerId=" + containerId + ", releaseId=" + releaseId + "]";
+        return "CreateContainerCommand [container=" + container + "]";
     }
 
 }

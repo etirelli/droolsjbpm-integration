@@ -37,12 +37,13 @@ import org.kie.server.api.commands.CallContainerCommand;
 import org.kie.server.api.commands.CommandScript;
 import org.kie.server.api.commands.CreateContainerCommand;
 import org.kie.server.api.commands.DisposeContainerCommand;
-import org.kie.server.api.model.KieContainerInfo;
-import org.kie.server.api.model.KieContainerInfoList;
+import org.kie.server.api.model.KieContainerResource;
+import org.kie.server.api.model.KieContainerResourceList;
 import org.kie.server.api.model.KieServerCommand;
 import org.kie.server.api.model.KieServerInfo;
 import org.kie.server.api.model.ReleaseId;
 import org.kie.server.api.model.ServiceResponse;
+import org.kie.server.api.model.KieContainerStatus;
 import org.kie.server.client.KieServicesClient;
 import org.kie.server.services.impl.KieServerImpl;
 
@@ -89,45 +90,45 @@ public class KieServerTest {
 
     @Test
     public void testCreateContainer() throws Exception {
-        ServiceResponse<KieContainerInfo> reply = client.createContainer("kie1", releaseId);
+        ServiceResponse<KieContainerResource> reply = client.createContainer("kie1", new KieContainerResource("kie1", releaseId));
         Assert.assertEquals(ServiceResponse.ResponseType.SUCCESS, reply.getType());
     }
 
     @Test
     public void testGetContainerInfo() throws Exception {
-        client.createContainer("kie1", releaseId);
-        ServiceResponse<KieContainerInfo> reply = client.getContainerInfo("kie1");
+        client.createContainer("kie1", new KieContainerResource("kie1", releaseId));
+        ServiceResponse<KieContainerResource> reply = client.getContainerInfo("kie1");
         Assert.assertEquals(ServiceResponse.ResponseType.SUCCESS, reply.getType());
         
-        KieContainerInfo info = reply.getResult();
-        Assert.assertEquals( KieContainerInfo.Status.STARTED, info.getStatus() );
+        KieContainerResource info = reply.getResult();
+        Assert.assertEquals( KieContainerStatus.STARTED, info.getStatus() );
     }
 
     @Test
     public void testGetContainerInfoNonExisting() throws Exception {
-        ServiceResponse<KieContainerInfo> reply = client.getContainerInfo("kie1");
+        ServiceResponse<KieContainerResource> reply = client.getContainerInfo("kie1");
         Assert.assertEquals(ServiceResponse.ResponseType.FAILURE, reply.getType());
     }
 
     @Test
     public void testListContainers() throws Exception {
-        client.createContainer("kie1", releaseId);
-        client.createContainer("kie2", releaseId);
-        ServiceResponse<KieContainerInfoList> reply = client.listContainers();
+        client.createContainer("kie1", new KieContainerResource("kie1", releaseId));
+        client.createContainer("kie2", new KieContainerResource("kie2", releaseId));
+        ServiceResponse<KieContainerResourceList> reply = client.listContainers();
         Assert.assertEquals(ServiceResponse.ResponseType.SUCCESS, reply.getType());
         Assert.assertEquals(2, reply.getResult().getContainers().size());
     }
 
     @Test
     public void testDisposeContainer() throws Exception {
-        client.createContainer("kie1", releaseId);
+        client.createContainer("kie1", new KieContainerResource("kie1", releaseId));
         ServiceResponse<Void> reply = client.disposeContainer("kie1");
         Assert.assertEquals(ServiceResponse.ResponseType.SUCCESS, reply.getType());
     }
 
     @Test
     public void testCallContainer() throws Exception {
-        client.createContainer("kie1", releaseId);
+        client.createContainer("kie1", new KieContainerResource("kie1", releaseId));
 
         String payload = "<batch-execution lookup=\"defaultKieSession\">\n" +
                 "  <insert out-identifier=\"message\">\n" +
@@ -144,7 +145,7 @@ public class KieServerTest {
 
     @Test
     public void testCallContainerMarshallCommands() throws Exception {
-        client.createContainer("kie1", releaseId);
+        client.createContainer("kie1", new KieContainerResource("kie1", releaseId));
 
         KieServices ks = KieServices.Factory.get();
         File jar = MavenRepository.getMavenRepository().resolveArtifact(releaseId).getFile();
@@ -189,7 +190,7 @@ public class KieServerTest {
 
         String payload = BatchExecutionHelper.newXStreamMarshaller().toXML(batch);
 
-        KieServerCommand create = new CreateContainerCommand("kie1", releaseId);
+        KieServerCommand create = new CreateContainerCommand(new KieContainerResource( "kie1", releaseId, null));
         KieServerCommand call = new CallContainerCommand("kie1", payload);
         KieServerCommand dispose = new DisposeContainerCommand("kie1");
 
@@ -205,7 +206,7 @@ public class KieServerTest {
 
     @Test
     public void testCallContainerLookupError() throws Exception {
-        client.createContainer("kie1", releaseId);
+        client.createContainer("kie1", new KieContainerResource("kie1", releaseId));
 
         String payload = "<batch-execution lookup=\"xyz\">\n" +
                 "  <insert out-identifier=\"message\">\n" +

@@ -12,7 +12,7 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
 import org.kie.server.api.commands.CommandScript;
-import org.kie.server.api.model.ReleaseId;
+import org.kie.server.api.model.KieContainerResource;
 
 @Path("/server")
 public interface KieServer {
@@ -40,7 +40,7 @@ public interface KieServer {
     @Path("containers/{id}")
     @Consumes(MediaType.APPLICATION_XML)
     @Produces(MediaType.APPLICATION_XML)
-    public Response createContainer( @PathParam("id") String id, ReleaseId releaseId );
+    public Response createContainer( @PathParam("id") String id, KieContainerResource container );
     
     @DELETE
     @Path("containers/{id}")

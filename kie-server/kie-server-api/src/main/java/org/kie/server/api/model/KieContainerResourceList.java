@@ -10,25 +10,25 @@ import javax.xml.bind.annotation.XmlRootElement;
 
 @XmlRootElement(name="kie-containers")
 @XmlAccessorType (XmlAccessType.FIELD)
-public class KieContainerInfoList {
+public class KieContainerResourceList {
     
-    @XmlElement(name = "kie-container-info")
-    private List<KieContainerInfo> containers;
+    @XmlElement
+    private List<KieContainerResource> containers;
 
-    public KieContainerInfoList() {
+    public KieContainerResourceList() {
         super();
     }
 
-    public KieContainerInfoList(List<KieContainerInfo> containers) {
+    public KieContainerResourceList(List<KieContainerResource> containers) {
         super();
         this.containers = containers;
     }
     
-    public List<KieContainerInfo> getContainers() {
+    public List<KieContainerResource> getContainers() {
         return containers;
     }
     
-    public void setContainers(List<KieContainerInfo> containers) {
+    public void setContainers(List<KieContainerResource> containers) {
         this.containers = containers;
     }
 
