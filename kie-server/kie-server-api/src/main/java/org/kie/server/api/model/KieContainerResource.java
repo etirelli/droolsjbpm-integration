@@ -11,6 +11,7 @@ public class KieContainerResource {
     private ReleaseId          releaseId;
     private ReleaseId          resolvedReleaseId;
     private KieContainerStatus status;
+    private KieScannerResource scanner;
 
     public KieContainerResource() {
     }
@@ -64,6 +65,15 @@ public class KieContainerResource {
 
     public void setResolvedReleaseId(ReleaseId resolvedReleaseId) {
         this.resolvedReleaseId = resolvedReleaseId;
+    }
+    
+    @XmlElement
+    public KieScannerResource getScanner() {
+        return scanner;
+    }
+    
+    public void setScanner(KieScannerResource scanner) {
+        this.scanner = scanner;
     }
 
     @Override

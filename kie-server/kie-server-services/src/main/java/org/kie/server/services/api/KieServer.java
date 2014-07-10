@@ -13,6 +13,7 @@ import javax.ws.rs.core.Response;
 
 import org.kie.server.api.commands.CommandScript;
 import org.kie.server.api.model.KieContainerResource;
+import org.kie.server.api.model.KieScannerResource;
 
 @Path("/server")
 public interface KieServer {
@@ -52,5 +53,16 @@ public interface KieServer {
     @Consumes(MediaType.APPLICATION_XML)
     @Produces(MediaType.APPLICATION_XML)
     public Response execute( @PathParam("id") String id, String cmdPayload );
+    
+    @GET
+    @Path("containers/{id}/scanner")
+    @Consumes(MediaType.APPLICATION_XML)
+    public Response getScannerInfo( @PathParam("id") String id );
+    
+    @POST
+    @Path("containers/{id}/scanner")
+    @Consumes(MediaType.APPLICATION_XML)
+    @Produces(MediaType.APPLICATION_XML)
+    public Response updateScanner( @PathParam("id") String id, KieScannerResource resource );
     
 } 
