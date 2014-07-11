@@ -12,6 +12,7 @@ import org.jboss.resteasy.util.GenericType;
 import org.kie.server.api.commands.CommandScript;
 import org.kie.server.api.model.KieContainerResource;
 import org.kie.server.api.model.KieContainerResourceList;
+import org.kie.server.api.model.KieScannerResource;
 import org.kie.server.api.model.KieServerInfo;
 import org.kie.server.api.model.ServiceResponse;
 
@@ -33,6 +34,8 @@ public class KieServicesClient {
                 return response.getEntity();
             }
             throw new ClientResponseFailure("Unexpected response code: "+response.getStatus(), response );
+        } catch (ClientResponseFailure e) {
+            throw e;
         } catch (Exception e) {
             throw new ClientResponseFailure("Unexpected exception retrieving server info.", e, response );
         }
@@ -47,6 +50,8 @@ public class KieServicesClient {
                 return response.getEntity();
             }
             throw new ClientResponseFailure("Unexpected response code: "+response.getStatus(), response );
+        } catch (ClientResponseFailure e) {
+            throw e;
         } catch (Exception e) {
             throw new ClientResponseFailure("Unexpected exception retrieving list of containers.", e, response );
         }
@@ -61,6 +66,8 @@ public class KieServicesClient {
                 return response.getEntity();
             }
             throw new ClientResponseFailure("Unexpected response code: "+response.getStatus(), response );
+        } catch (ClientResponseFailure e) {
+            throw e;
         } catch (Exception e) {
             throw new ClientResponseFailure("Unexpected exception creating container: "+id+" with release-id "+resource.getReleaseId(), e, response );
         }
@@ -75,6 +82,8 @@ public class KieServicesClient {
                 return response.getEntity();
             }
             throw new ClientResponseFailure("Unexpected response code: "+response.getStatus(), response );
+        } catch (ClientResponseFailure e) {
+            throw e;
         } catch (Exception e) {
             throw new ClientResponseFailure("Unexpected exception retrieving container info.", e, response );
         }
@@ -89,6 +98,8 @@ public class KieServicesClient {
                 return response.getEntity();
             }
             throw new ClientResponseFailure("Unexpected response code: "+response.getStatus(), response );
+        } catch (ClientResponseFailure e) {
+            throw e;
         } catch (Exception e) {
             throw new ClientResponseFailure("Unexpected exception disposing container: "+id, e, response );
         }
@@ -103,6 +114,8 @@ public class KieServicesClient {
                 return response.getEntity();
             }
             throw new ClientResponseFailure("Unexpected response code: "+response.getStatus(), response );
+        } catch (ClientResponseFailure e) {
+            throw e;
         } catch (Exception e) {
             throw new ClientResponseFailure("Unexpected exception executing commands on container "+id, e, response );
         }
@@ -117,8 +130,43 @@ public class KieServicesClient {
                 return response.getEntity();
             }
             throw new ClientResponseFailure("Unexpected response code: "+response.getStatus(), response );
+        } catch (ClientResponseFailure e) {
+            throw e;
         } catch (Exception e) {
             throw new ClientResponseFailure("Unexpected exception retrieving server info.", e, response );
         }
     }
+    
+    public ServiceResponse<KieScannerResource> getScannerInfo( String id ) {
+        ClientResponse<ServiceResponse<KieScannerResource>> response = null;
+        try {
+            ClientRequest clientRequest = new ClientRequest(baseURI+"/containers/"+id+"/scanner");
+            response = clientRequest.get(new GenericType<ServiceResponse<KieScannerResource>>(){});
+            if( response.getStatus() == Response.Status.OK.getStatusCode() ) {
+                return response.getEntity();
+            }
+            throw new ClientResponseFailure("Unexpected response code: "+response.getStatus(), response );
+        } catch (ClientResponseFailure e) {
+            throw e;
+        } catch (Exception e) {
+            throw new ClientResponseFailure("Unexpected exception retrieving scanner info for container '"+id+"'.", e, response );
+        }
+    }
+    
+    public ServiceResponse<KieScannerResource> updateScanner( String id, KieScannerResource resource ) {
+        ClientResponse<ServiceResponse<KieScannerResource>> response = null;
+        try {
+            ClientRequest clientRequest = new ClientRequest(baseURI+"/containers/"+id+"/scanner");
+            response = clientRequest.body(MediaType.APPLICATION_XML_TYPE, resource).post(new GenericType<ServiceResponse<KieScannerResource>>(){});
+            if( response.getStatus() == Response.Status.OK.getStatusCode() ) {
+                return response.getEntity();
+            }
+            throw new ClientResponseFailure("Unexpected response code: "+response.getStatus(), response );
+        } catch (ClientResponseFailure e) {
+            throw e;
+        } catch (Exception e) {
+            throw new ClientResponseFailure("Unexpected exception scanner for container '"+id+"'.", e, response );
+        }
+    }
+    
 }

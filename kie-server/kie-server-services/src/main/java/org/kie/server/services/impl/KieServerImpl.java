@@ -18,7 +18,6 @@ import org.drools.compiler.kie.builder.impl.InternalKieScanner;
 import org.drools.core.command.impl.GenericCommand;
 import org.drools.core.command.runtime.BatchExecutionCommandImpl;
 import org.kie.api.KieServices;
-import org.kie.api.builder.KieScanner;
 import org.kie.api.command.Command;
 import org.kie.api.runtime.ExecutionResults;
 import org.kie.api.runtime.KieSession;
@@ -94,7 +93,7 @@ public class KieServerImpl implements KieServer {
     
     @Override
     public Response getScannerInfo(String id) {
-        return null;
+        return Response.ok(getScannerInfo(context, id)).build();
     }
 
     @Override
@@ -276,6 +275,29 @@ public class KieServerImpl implements KieServer {
         }
     }
     
+    private ServiceResponse<KieScannerResource> getScannerInfo(KieContainersRegistry context, String id) {
+        try {
+            KieContainerInstance kci = (KieContainerInstance) context.getContainer(id);
+            if (kci != null && kci.getKieContainer() != null) {
+                InternalKieScanner scanner = kci.getScanner();
+                KieScannerResource info = null;
+                if( scanner != null ) {
+                    info = new KieScannerResource(mapStatus(scanner.getStatus()));
+                } else {
+                    info = new KieScannerResource(KieScannerStatus.DISPOSED);
+                }
+                return new ServiceResponse<KieScannerResource>(ServiceResponse.ResponseType.SUCCESS, "Scanner info successfully retrieved", info ); 
+            } else {
+                return new ServiceResponse<KieScannerResource>(ServiceResponse.ResponseType.FAILURE, 
+                        "Unknown container "+id+".");
+            }
+        } catch (Exception e) {
+            logger.error("Error retrieving scanner info for container '"+id+"'.", e);
+            return new ServiceResponse<KieScannerResource>(ServiceResponse.ResponseType.FAILURE, "Error retrieving scanner info for container '"+id+"': " + 
+                         e.getClass().getName() + ": " + e.getMessage());
+        }
+    }
+
     private ServiceResponse<KieScannerResource> updateScanner(KieContainersRegistry context, String id, KieScannerResource resource) {
         KieScannerStatus status = resource.getStatus();
         if( status == null ) {
@@ -402,7 +424,7 @@ public class KieServerImpl implements KieServer {
     }
 
     private ServiceResponse<KieScannerResource> createScanner(String id, KieContainerInstance kci) {
-        if( kci.getScanner() != null ) {
+        if( kci.getScanner() == null ) {
             InternalKieScanner scanner = (InternalKieScanner) KieServices.Factory.get().newKieScanner(kci.getKieContainer());
             kci.setScanner( scanner );
             return new ServiceResponse<KieScannerResource>(ServiceResponse.ResponseType.SUCCESS,

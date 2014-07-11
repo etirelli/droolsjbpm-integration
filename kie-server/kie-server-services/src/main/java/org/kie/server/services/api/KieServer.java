@@ -56,7 +56,7 @@ public interface KieServer {
     
     @GET
     @Path("containers/{id}/scanner")
-    @Consumes(MediaType.APPLICATION_XML)
+    @Produces(MediaType.APPLICATION_XML)
     public Response getScannerInfo( @PathParam("id") String id );
     
     @POST

@@ -39,11 +39,14 @@ import org.kie.server.api.commands.CreateContainerCommand;
 import org.kie.server.api.commands.DisposeContainerCommand;
 import org.kie.server.api.model.KieContainerResource;
 import org.kie.server.api.model.KieContainerResourceList;
+import org.kie.server.api.model.KieContainerStatus;
+import org.kie.server.api.model.KieScannerResource;
+import org.kie.server.api.model.KieScannerStatus;
 import org.kie.server.api.model.KieServerCommand;
 import org.kie.server.api.model.KieServerInfo;
 import org.kie.server.api.model.ReleaseId;
 import org.kie.server.api.model.ServiceResponse;
-import org.kie.server.api.model.KieContainerStatus;
+import org.kie.server.api.model.ServiceResponse.ResponseType;
 import org.kie.server.client.KieServicesClient;
 import org.kie.server.services.impl.KieServerImpl;
 
@@ -51,7 +54,7 @@ import com.thoughtworks.xstream.XStream;
 
 public class KieServerTest {
 
-    private static final int        PORT = 8756;
+    private static final int       PORT = findFreePort();
     private static MavenRepository  repository;
     private static ReleaseId        releaseId;
     private TJWSEmbeddedJaxrsServer server;
@@ -220,6 +223,48 @@ public class KieServerTest {
         Assert.assertEquals(ServiceResponse.ResponseType.FAILURE, reply.getType());
     }
 
+    @Test
+    public void testScanner() throws Exception {
+        client.createContainer("kie1", new KieContainerResource("kie1", releaseId));
+        ServiceResponse<KieContainerResource> reply = client.getContainerInfo("kie1");
+        Assert.assertEquals(ServiceResponse.ResponseType.SUCCESS, reply.getType());
+        
+        ServiceResponse<KieScannerResource> si = client.getScannerInfo("kie1");
+        Assert.assertEquals( ResponseType.SUCCESS, si.getType() );
+        KieScannerResource info = si.getResult();
+        Assert.assertEquals( KieScannerStatus.DISPOSED, info.getStatus() );
+        
+        si = client.updateScanner("kie1", new KieScannerResource(KieScannerStatus.STARTED, 10000l));
+        Assert.assertEquals( si.getMsg(), ResponseType.SUCCESS, si.getType() );
+        info = si.getResult();
+        Assert.assertEquals( KieScannerStatus.STARTED, info.getStatus() );
+        
+        si = client.getScannerInfo("kie1");
+        Assert.assertEquals( si.getMsg(), ResponseType.SUCCESS, si.getType() );
+        info = si.getResult();
+        Assert.assertEquals( KieScannerStatus.STARTED, info.getStatus() );
+        
+        si = client.updateScanner("kie1", new KieScannerResource(KieScannerStatus.STOPPED, 10000l));
+        Assert.assertEquals( si.getMsg(), ResponseType.SUCCESS, si.getType() );
+        info = si.getResult();
+        Assert.assertEquals( KieScannerStatus.STOPPED, info.getStatus() );
+        
+        si = client.getScannerInfo("kie1");
+        Assert.assertEquals( si.getMsg(), ResponseType.SUCCESS, si.getType() );
+        info = si.getResult();
+        Assert.assertEquals( KieScannerStatus.STOPPED, info.getStatus() );
+        
+        si = client.updateScanner("kie1", new KieScannerResource(KieScannerStatus.DISPOSED, 10000l));
+        Assert.assertEquals( si.getMsg(), ResponseType.SUCCESS, si.getType() );
+        info = si.getResult();
+        Assert.assertEquals( KieScannerStatus.DISPOSED, info.getStatus() );
+        
+        si = client.getScannerInfo("kie1");
+        Assert.assertEquals( si.getMsg(), ResponseType.SUCCESS, si.getType() );
+        info = si.getResult();
+        Assert.assertEquals( KieScannerStatus.DISPOSED, info.getStatus() );
+    }
+
     public static byte[] createAndDeployJar(KieServices ks,
             ReleaseId releaseId,
             String... drls) {
@@ -288,12 +333,18 @@ public class KieServerTest {
         ks.getRepository().removeKieModule(releaseId);
     }
 
-    public static int findFreePort()
-            throws IOException {
-        ServerSocket server =
-                new ServerSocket(0);
-        int port = server.getLocalPort();
-        server.close();
+    public static int findFreePort() {
+        int port = 0;
+        try {
+            ServerSocket server =
+                    new ServerSocket(0);
+            port = server.getLocalPort();
+            server.close();
+        } catch (IOException e) {
+            // failed to dynamically allocate port, try to use hard coded one
+            port = 9789;
+        }
+        System.out.println("Allocating port: "+port);
         return port;
     }
 

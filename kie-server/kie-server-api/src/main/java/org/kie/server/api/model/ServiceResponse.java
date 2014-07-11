@@ -20,9 +20,10 @@ public class ServiceResponse<T> {
     private String msg;
     @XmlElements({
         @XmlElement(name = "kie-server-info", type = KieServerInfo.class),
-        @XmlElement(name = "kie-container-info", type = KieContainerResource.class),
+        @XmlElement(name = "kie-container", type = KieContainerResource.class),
         @XmlElement(name = "results", type = String.class),
-        @XmlElement(name = "kie-containers", type = KieContainerResourceList.class)
+        @XmlElement(name = "kie-containers", type = KieContainerResourceList.class),
+        @XmlElement(name = "kie-scanner", type = KieScannerResource.class)
     })
     private T result;
     
