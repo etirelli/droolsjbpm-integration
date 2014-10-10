@@ -56,10 +56,10 @@ public abstract class KieServerBaseIntegrationTest {
 
     private static Logger logger = LoggerFactory.getLogger(KieServerBaseIntegrationTest.class);
 
-    protected static final String DEFAULT_USERNAME = "yoda";
-    protected static final String DEFAULT_PASSWORD = "usetheforce123@";
+    protected static final String DEFAULT_USERNAME = "kieserver";
+    protected static final String DEFAULT_PASSWORD = "kieserver";
 
-    protected static String BASE_URI = System.getProperty("kie.server.base.uri");
+    protected static String BASE_URI = "http://localhost:8080/kie-server-services-6.2.0-SNAPSHOT/services/rest/server";
 
     protected static boolean LOCAL_SERVER = false;
 
@@ -104,7 +104,7 @@ public abstract class KieServerBaseIntegrationTest {
     @Before
     public void setup() throws Exception {
         if (LOCAL_SERVER) {
-            startServer();
+            //startServer();
         }
         startClient();
         disposeAllContainers();
@@ -113,7 +113,7 @@ public abstract class KieServerBaseIntegrationTest {
     @After
     public void tearDown() {
         if (LOCAL_SERVER) {
-            server.stop();
+            //server.stop();
         }
     }
 

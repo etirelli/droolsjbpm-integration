@@ -93,7 +93,7 @@ public class KieServerImpl {
                     }
                 });
             }
-        } catch (Exception e) {
+        } catch (Throwable e) {
             // new filesystem. create.
             fs = ios.newFileSystem(uri, new HashMap<String, Object>() {
 
@@ -128,7 +128,7 @@ public class KieServerImpl {
             Version version = KieServerEnvironment.getVersion();
             String versionStr = version != null ? version.toString() : "Unknown-Version";
             return new ServiceResponse<KieServerInfo>(ServiceResponse.ResponseType.SUCCESS, "Kie Server info", new KieServerInfo(versionStr));
-        } catch (Exception e) {
+        } catch (Throwable e) {
             logger.error("Error retrieving server info:", e);
             return new ServiceResponse<KieServerInfo>(ServiceResponse.ResponseType.FAILURE, "Error retrieving kie server info: " +
                     e.getClass().getName() + ": " + e.getMessage());
@@ -159,7 +159,7 @@ public class KieServerImpl {
                             ci.getResource().setStatus(KieContainerStatus.FAILED);
                             return new ServiceResponse<KieContainerResource>(ServiceResponse.ResponseType.FAILURE, "Failed to create container " + containerId + " with module " + releaseId + ".");
                         }
-                    } catch (Exception e) {
+                    } catch (Throwable e) {
                         logger.error("Error creating container '" + containerId + "' for module '" + releaseId + "'", e);
                         ci.getResource().setStatus(KieContainerStatus.FAILED);
                         return new ServiceResponse<KieContainerResource>(ServiceResponse.ResponseType.FAILURE, "Failed to create container " + containerId + " with module " + releaseId + ": " + e.getClass().getName() + ": " + e.getMessage());
@@ -170,7 +170,7 @@ public class KieServerImpl {
                     return new ServiceResponse<KieContainerResource>(ServiceResponse.ResponseType.FAILURE, "Container " + containerId + " already exists.", previous.getResource());
                 }
             }
-        } catch (Exception e) {
+        } catch (Throwable e) {
             logger.error("Error creating container '" + containerId + "' for module '" + releaseId + "'", e);
             return new ServiceResponse<KieContainerResource>(ServiceResponse.ResponseType.FAILURE, "Error creating container " + containerId +
                     " with module " + releaseId + ": " + e.getClass().getName() + ": " + e.getMessage());
@@ -185,7 +185,7 @@ public class KieServerImpl {
             }
             KieContainerResourceList cil = new KieContainerResourceList(containers);
             return new ServiceResponse<KieContainerResourceList>(ServiceResponse.ResponseType.SUCCESS, "List of created containers", cil);
-        } catch (Exception e) {
+        } catch (Throwable e) {
             logger.error("Error retrieving list of containers", e);
             return new ServiceResponse<KieContainerResourceList>(ServiceResponse.ResponseType.FAILURE, "Error listing containers: " +
                     e.getClass().getName() + ": " + e.getMessage());
@@ -199,7 +199,7 @@ public class KieServerImpl {
                 return new ServiceResponse<KieContainerResource>(ServiceResponse.ResponseType.SUCCESS, "Info for container " + id, ci.getResource());
             }
             return new ServiceResponse<KieContainerResource>(ServiceResponse.ResponseType.FAILURE, "Container " + id + " is not instantiated.");
-        } catch (Exception e) {
+        } catch (Throwable e) {
             logger.error("Error retrieving info for container '" + id + "'", e);
             return new ServiceResponse<KieContainerResource>(ServiceResponse.ResponseType.FAILURE, "Error retrieving container info: " +
                     e.getClass().getName() + ": " + e.getMessage());
@@ -262,7 +262,7 @@ public class KieServerImpl {
             } else {
                 return new ServiceResponse<String>(ServiceResponse.ResponseType.FAILURE, "Container " + containerId + " is not instantiated.");
             }
-        } catch (Exception e) {
+        } catch (Throwable e) {
             logger.error("Error calling container '" + containerId + "'", e);
             return new ServiceResponse<String>(ServiceResponse.ResponseType.FAILURE, "Error calling container " + containerId + ": " +
                     e.getClass().getName() + ": " + e.getMessage());
@@ -281,7 +281,7 @@ public class KieServerImpl {
                         try {
                             // this may fail, but we already removed the container from the registry
                             kieContainer.dispose();
-                        } catch (Exception e) {
+                        } catch (Throwable e) {
                             logger.warn("Container '" + containerId + "' disposed, but an unexpected exception was raised", e);
                             return new ServiceResponse<Void>(ServiceResponse.ResponseType.SUCCESS, "Container " + containerId +
                                     " disposed, but exception was raised: " + e.getClass().getName() + ": " + e.getMessage());
@@ -294,7 +294,7 @@ public class KieServerImpl {
             } else {
                 return new ServiceResponse<Void>(ServiceResponse.ResponseType.SUCCESS, "Container " + containerId + " was not instantiated.");
             }
-        } catch (Exception e) {
+        } catch (Throwable e) {
             logger.error("Error disposing Container '" + containerId + "'", e);
             return new ServiceResponse<Void>(ServiceResponse.ResponseType.FAILURE, "Error disposing container " + containerId + ": " +
                     e.getClass().getName() + ": " + e.getMessage());
@@ -317,7 +317,7 @@ public class KieServerImpl {
                 return new ServiceResponse<KieScannerResource>(ServiceResponse.ResponseType.FAILURE,
                         "Unknown container " + id + ".");
             }
-        } catch (Exception e) {
+        } catch (Throwable e) {
             logger.error("Error retrieving scanner info for container '" + id + "'.", e);
             return new ServiceResponse<KieScannerResource>(ServiceResponse.ResponseType.FAILURE, "Error retrieving scanner info for container '" + id + "': " +
                     e.getClass().getName() + ": " + e.getMessage());
@@ -358,7 +358,7 @@ public class KieServerImpl {
                 return new ServiceResponse<KieScannerResource>(ServiceResponse.ResponseType.FAILURE,
                         "Unknown container " + id + ".");
             }
-        } catch (Exception e) {
+        } catch (Throwable e) {
             logger.error("Error updating scanner for container '" + id + "': " + resource, e);
             return new ServiceResponse<KieScannerResource>(ServiceResponse.ResponseType.FAILURE, "Error updating scanner for container '" + id +
                     "': " + resource + ": " + e.getClass().getName() + ": " + e.getMessage());
@@ -470,7 +470,7 @@ public class KieServerImpl {
                 return new ServiceResponse<ReleaseId>(ServiceResponse.ResponseType.SUCCESS, "ReleaseId for container " + id, ci.getResource().getReleaseId());
             }
             return new ServiceResponse<ReleaseId>(ServiceResponse.ResponseType.FAILURE, "Container " + id + " is not instantiated.");
-        } catch (Exception e) {
+        } catch (Throwable e) {
             logger.error("Error retrieving releaseId for container '" + id + "'", e);
             return new ServiceResponse<ReleaseId>(ServiceResponse.ResponseType.FAILURE, "Error retrieving container releaseId: " +
                     e.getClass().getName() + ": " + e.getMessage());
@@ -498,7 +498,7 @@ public class KieServerImpl {
             } else {
                 return new ServiceResponse<ReleaseId>(ServiceResponse.ResponseType.FAILURE, "Container " + id + " is not instantiated.");
             }
-        } catch (Exception e) {
+        } catch (Throwable e) {
             logger.error("Error updating releaseId for container '" + id + "'", e);
             return new ServiceResponse<ReleaseId>(ServiceResponse.ResponseType.FAILURE, "Error updating releaseId for container " + id + ": " +
                     e.getClass().getName() + ": " + e.getMessage());
@@ -578,7 +578,7 @@ public class KieServerImpl {
                             reader = Files.newBufferedReader(entry.resolve(CONTAINER_STATE_FILE), Charset.forName("UTF-8"));
                             KieContainerResource resource = (KieContainerResource) xs.fromXML(reader);
                             restore(resource);
-                        } catch (Exception e) {
+                        } catch (Throwable e) {
                             logger.error("Error restoring kie container state", e);
                         } finally {
                             if (reader != null) {
@@ -591,7 +591,7 @@ public class KieServerImpl {
                     }
                 }
             }
-        } catch (Exception e) {
+        } catch (Throwable e) {
             logger.error("Error restoring kie server state", e);
         } finally {
             if (ds != null)
@@ -608,7 +608,7 @@ public class KieServerImpl {
                 Path file = fs.getPath("/containers/" + ci.getContainerId() + "/" + CONTAINER_STATE_FILE);
                 writer = Files.newBufferedWriter(file, Charset.forName("UTF-8"));
                 xs.toXML(ci.getResource(), writer);
-            } catch (Exception e) {
+            } catch (Throwable e) {
                 logger.error("Error persisting state for kie container '" + ci.getContainerId() + "'", e);
             } finally {
                 if (writer != null) {
