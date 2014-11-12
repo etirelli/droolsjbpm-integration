@@ -21,6 +21,7 @@ import org.jboss.resteasy.client.ClientResponseFailure;
 import org.jboss.resteasy.client.core.executors.ApacheHttpClient4Executor;
 import org.jboss.resteasy.spi.ResteasyProviderFactory;
 import org.jboss.resteasy.util.GenericType;
+import org.kie.remote.common.rest.KieRemoteHttpRequest;
 import org.kie.server.api.commands.CommandScript;
 import org.kie.server.api.model.KieContainerResource;
 import org.kie.server.api.model.KieContainerResourceList;
@@ -73,8 +74,9 @@ public class KieServicesClient {
     public ServiceResponse<KieServerInfo> getServerInfo() throws ClientResponseFailure {
         ClientResponse<ServiceResponse<KieServerInfo>> response = null;
         try {
-            ClientRequest clientRequest = newRequest(baseURI);
-            response = clientRequest.get(new GenericType<ServiceResponse<KieServerInfo>>(){});
+            KieRemoteHttpRequest clientRequest = newRequest(baseURI);
+//            response = clientRequest.get(new GenericType<ServiceResponse<KieServerInfo>>(){});
+            response = clientRequest.get().response();
             if( response.getStatus() == Response.Status.OK.getStatusCode() ) {
                 return response.getEntity();
             }
@@ -86,7 +88,7 @@ public class KieServicesClient {
         }
     }
 
-    private ClientRequest newRequest(String uri) {
+    private KieRemoteHttpRequest newRequest(String uri) {
         URI uriObject;
         try {
             uriObject = new URI(uri);
@@ -94,7 +96,8 @@ public class KieServicesClient {
             throw new RuntimeException("Malformed URI was specified: '" + uri + "'!", e);
         }
         if (username == null || password == null) {
-            return new ClientRequest(uri).accept(mediaType);
+//            return new KieRemoteHttpRequest(uri).accept(mediaType);
+            return KieRemoteHttpRequest.newRequest(uri).accept(mediaType.toString());
         } else {
             CredentialsProvider credentialsProvider = new BasicCredentialsProvider();
             credentialsProvider.setCredentials(
@@ -102,17 +105,17 @@ public class KieServicesClient {
                     new UsernamePasswordCredentials(username, password)
             );
 
-            DefaultHttpClient client = new DefaultHttpClient();
-            client.setCredentialsProvider(credentialsProvider);
-            ApacheHttpClient4Executor executor = new ApacheHttpClient4Executor(client);
-            return new ClientRequest(uri, executor).accept(mediaType);
+            KieRemoteHttpRequest req = KieRemoteHttpRequest.newRequest(uri);
+            req.basicAuthorization(username, password);
+            req.accept(mediaType.toString());
+            return req;
         }
     }
 
     public ServiceResponse<KieContainerResourceList> listContainers() throws ClientResponseFailure {
         ClientResponse<ServiceResponse<KieContainerResourceList>> response = null;
         try {
-            ClientRequest clientRequest = newRequest(baseURI + "/containers");
+            KieRemoteHttpRequest clientRequest = newRequest(baseURI + "/containers");
             response = clientRequest.get(new GenericType<ServiceResponse<KieContainerResourceList>>(){});
             if( response.getStatus() == Response.Status.OK.getStatusCode() ) {
                 return response.getEntity();
@@ -128,7 +131,7 @@ public class KieServicesClient {
     public ServiceResponse<KieContainerResource> createContainer(String id, KieContainerResource resource) throws ClientResponseFailure {
         ClientResponse<ServiceResponse<KieContainerResource>> response = null;
         try {
-            ClientRequest clientRequest = newRequest(baseURI + "/containers/" + id);
+            KieRemoteHttpRequest clientRequest = newRequest(baseURI + "/containers/" + id);
             response = clientRequest.body(mediaType, resource).put(new GenericType<ServiceResponse<KieContainerResource>>(){});
             if( response.getStatus() == Response.Status.CREATED.getStatusCode() ) {
                 return response.getEntity();
@@ -146,7 +149,7 @@ public class KieServicesClient {
     public ServiceResponse<KieContainerResource> getContainerInfo(String id) throws ClientResponseFailure {
         ClientResponse<ServiceResponse<KieContainerResource>> response = null;
         try {
-            ClientRequest clientRequest = newRequest(baseURI + "/containers/" + id);
+            KieRemoteHttpRequest clientRequest = newRequest(baseURI + "/containers/" + id);
             response = clientRequest.get(new GenericType<ServiceResponse<KieContainerResource>>(){});
             if( response.getStatus() == Response.Status.OK.getStatusCode() ) {
                 return response.getEntity();
@@ -162,7 +165,7 @@ public class KieServicesClient {
     public ServiceResponse<Void> disposeContainer(String id) throws ClientResponseFailure {
         ClientResponse<ServiceResponse<Void>> response = null;
         try {
-            ClientRequest clientRequest = newRequest(baseURI + "/containers/" + id);
+            KieRemoteHttpRequest clientRequest = newRequest(baseURI + "/containers/" + id);
             response = clientRequest.delete(new GenericType<ServiceResponse<Void>>(){});
             if( response.getStatus() == Response.Status.OK.getStatusCode() ) {
                 return response.getEntity();
@@ -178,7 +181,7 @@ public class KieServicesClient {
     public ServiceResponse<String> executeCommands(String id, String payload) throws ClientResponseFailure {
         ClientResponse<ServiceResponse<String>> response = null;
         try {
-            ClientRequest clientRequest = newRequest(baseURI + "/containers/" + id);
+            KieRemoteHttpRequest clientRequest = newRequest(baseURI + "/containers/" + id);
             response = clientRequest.body(mediaType, payload).post(new GenericType<ServiceResponse<String>>(){});
             if( response.getStatus() == Response.Status.OK.getStatusCode() ) {
                 return response.getEntity();
@@ -194,7 +197,7 @@ public class KieServicesClient {
     public List<ServiceResponse<? extends Object>> executeScript(CommandScript script) throws ClientResponseFailure {
         ClientResponse<List<ServiceResponse<? extends Object>>> response = null;
         try {
-            ClientRequest clientRequest = newRequest(baseURI);
+            KieRemoteHttpRequest clientRequest = newRequest(baseURI);
             response = clientRequest.body(mediaType, script).post(new GenericType<List<ServiceResponse<? extends Object>>>() {});
             if( response.getStatus() == Response.Status.OK.getStatusCode() ) {
                 return response.getEntity();
@@ -210,7 +213,7 @@ public class KieServicesClient {
     public ServiceResponse<KieScannerResource> getScannerInfo( String id ) {
         ClientResponse<ServiceResponse<KieScannerResource>> response = null;
         try {
-            ClientRequest clientRequest = newRequest(baseURI + "/containers/" + id + "/scanner");
+            KieRemoteHttpRequest clientRequest = newRequest(baseURI + "/containers/" + id + "/scanner");
             response = clientRequest.get(new GenericType<ServiceResponse<KieScannerResource>>(){});
             if( response.getStatus() == Response.Status.OK.getStatusCode() ) {
                 return response.getEntity();
@@ -226,7 +229,7 @@ public class KieServicesClient {
     public ServiceResponse<KieScannerResource> updateScanner( String id, KieScannerResource resource ) {
         ClientResponse<ServiceResponse<KieScannerResource>> response = null;
         try {
-            ClientRequest clientRequest = newRequest(baseURI + "/containers/" + id + "/scanner");
+            KieRemoteHttpRequest clientRequest = newRequest(baseURI + "/containers/" + id + "/scanner");
             response = clientRequest.body(mediaType, resource).post(new GenericType<ServiceResponse<KieScannerResource>>(){});
             if( response.getStatus() == Response.Status.OK.getStatusCode() ) {
                 return response.getEntity();
@@ -242,7 +245,7 @@ public class KieServicesClient {
     public ServiceResponse<ReleaseId> updateReleaseId(String id, ReleaseId releaseId) {
         ClientResponse<ServiceResponse<ReleaseId>> response = null;
         try {
-            ClientRequest clientRequest = newRequest(baseURI + "/containers/" + id + "/release-id");
+            KieRemoteHttpRequest clientRequest = newRequest(baseURI + "/containers/" + id + "/release-id");
             response = clientRequest.body(mediaType, releaseId).post(new GenericType<ServiceResponse<ReleaseId>>(){});
             if( response.getStatus() == Response.Status.OK.getStatusCode() ) {
                 return response.getEntity();
