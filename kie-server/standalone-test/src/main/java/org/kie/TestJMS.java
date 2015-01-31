@@ -1,43 +1,29 @@
-package org.kie.server.integrationtests.jms;
+package org.kie;
 
-import org.junit.BeforeClass;
-import org.junit.Test;
-import org.kie.server.api.model.*;
 import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
-import javax.jms.*;
 import javax.naming.Context;
 import javax.naming.InitialContext;
 import java.util.Properties;
 
-public class JMSCRUDTest
-        extends BaseJMSIntegrationTest {
+import javax.jms.*;
 
-    private static ReleaseId releaseId1 = new ReleaseId( "org.kie.server.testing", "container-crud-tests1", "2.1.0.GA" );
-    private static ReleaseId releaseId2 = new ReleaseId( "org.kie.server.testing", "container-crud-tests1", "2.1.1.GA" );
+public class TestJMS {
 
-    private static final Logger log = org.slf4j.LoggerFactory.getLogger( JMSCRUDTest.class );
-
-    @BeforeClass
-    public static void initialize()
-            throws Exception {
-        createAndDeployKJar( releaseId1 );
-        createAndDeployKJar( releaseId2 );
-    }
+    public static final Logger log = LoggerFactory.getLogger( TestJMS.class );
 
     // Set up all the default values
-    private static final String DEFAULT_MESSAGE            = "Hello, World!";
+    private static final String DEFAULT_MESSAGE            = "<script><commands><list-containers/></commands></script>";
     private static final String DEFAULT_CONNECTION_FACTORY = "jms/RemoteConnectionFactory";
-    private static final String DEFAULT_DESTINATION = "java:/jms/queue/KieServerRequest";
-    private static final String DEFAULT_MESSAGE_COUNT = "1";
-    private static final String DEFAULT_USERNAME = "kieserver";
-    private static final String DEFAULT_PASSWORD = "kieserver";
-    private static final String INITIAL_CONTEXT_FACTORY = "org.jboss.naming.remote.client.InitialContextFactory";
-    private static final String PROVIDER_URL = "http-remoting://localhost:8080";
+    private static final String DEFAULT_DESTINATION        = "java:/jms/queue/KIE.SERVER.REQUEST";
+    private static final String DEFAULT_MESSAGE_COUNT      = "1";
+    private static final String DEFAULT_USERNAME           = "kieserver";
+    private static final String DEFAULT_PASSWORD           = "kieserver";
+    private static final String INITIAL_CONTEXT_FACTORY    = "org.jboss.naming.remote.client.InitialContextFactory";
+    private static final String PROVIDER_URL               = "http-remoting://localhost:8080";
 
-
-    @Test
-    public void testCreateContainer() throws Exception {
+    public static void main(String[] args) throws Exception {
         ConnectionFactory connectionFactory = null;
         Connection connection = null;
         Session session = null;
@@ -81,6 +67,8 @@ public class JMSCRUDTest
             // Send the specified number of messages
             for (int i = 0; i < count; i++) {
                 message = session.createTextMessage(content);
+                message.setJMSCorrelationID( new String( "cid="+i ) );
+                message.setIntProperty( "serialization_type", 0 );
                 producer.send(message);
             }
 
@@ -97,6 +85,6 @@ public class JMSCRUDTest
                 connection.close();
             }
         }
-    }
 
+    }
 }
