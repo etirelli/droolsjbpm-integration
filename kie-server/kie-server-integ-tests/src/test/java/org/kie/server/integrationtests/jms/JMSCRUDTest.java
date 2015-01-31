@@ -1,6 +1,7 @@
 package org.kie.server.integrationtests.jms;
 
 import org.junit.BeforeClass;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.kie.server.api.model.*;
 import org.slf4j.Logger;
@@ -10,6 +11,7 @@ import javax.naming.Context;
 import javax.naming.InitialContext;
 import java.util.Properties;
 
+@Ignore
 public class JMSCRUDTest
         extends BaseJMSIntegrationTest {
 
