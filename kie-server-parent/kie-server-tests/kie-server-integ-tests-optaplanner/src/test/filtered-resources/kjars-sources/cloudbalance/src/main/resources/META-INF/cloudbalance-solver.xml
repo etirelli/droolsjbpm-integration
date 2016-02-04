@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<solver>
+  <!-- Domain model configuration -->
+  <scanAnnotatedClasses/>
+
+  <!-- Score configuration -->
+  <scoreDirectorFactory>
+    <scoreDefinitionType>HARD_SOFT</scoreDefinitionType>
+    <ksessionName>cloudBalancingKsession</ksessionName> <!-- Or delete this line and set a default ksession in kmodule.xml-->
+    <initializingScoreTrend>ONLY_DOWN</initializingScoreTrend>
+  </scoreDirectorFactory>
+
+  <!-- Optimization algorithms configuration -->
+  <termination>
+    <secondsSpentLimit>60</secondsSpentLimit>
+  </termination>
+</solver>

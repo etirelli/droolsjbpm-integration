@@ -247,7 +247,7 @@ public abstract class AbstractKieServicesClientImpl {
     @SuppressWarnings("unchecked")
     protected <T> ServiceResponse<T> makeHttpPutRequestAndCreateServiceResponse(String uri, String body, Class<T> resultType) {
         logger.debug("About to send PUT request to '{}' with payload '{}'", uri, body);
-        KieRemoteHttpRequest request = newRequest(uri).body(body).put();
+        KieRemoteHttpRequest request = newRequest(uri).timeout( 30000 ).body(body).put();
         KieRemoteHttpResponse response = request.response();
 
         if ( response.code() == Response.Status.CREATED.getStatusCode() ||
