@@ -32,6 +32,7 @@ import javax.ws.rs.core.Variant;
 import org.kie.server.api.model.ServiceResponse;
 import org.kie.server.api.model.instance.RequestInfoInstanceList;
 import org.kie.server.api.model.instance.SolverInstance;
+import org.kie.server.api.rest.RestURI;
 import org.kie.server.remote.rest.optaplanner.resources.Messages;
 import org.kie.server.services.impl.marshal.MarshallerHelper;
 import org.kie.server.services.optaplanner.SolverServiceBase;
@@ -42,7 +43,7 @@ import org.slf4j.LoggerFactory;
 import static org.kie.server.api.rest.RestURI.*;
 import static org.kie.server.remote.rest.common.util.RestUtils.*;
 
-@Path("server/optaplanner/{id}/solvers/{solverId}")
+@Path("server/"+ RestURI.SOLVER_URI )
 public class SolverResource {
 
     public static final Logger logger = LoggerFactory.getLogger( SolverResource.class );
@@ -60,12 +61,14 @@ public class SolverResource {
 
     // operations
     @PUT
+    @Path( RestURI.SOLVER_ID_URI )
     @Consumes({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
     @Produces({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
     public Response createSolver(
             @javax.ws.rs.core.Context HttpHeaders headers, @PathParam(CONTAINER_ID) String containerId,
             @PathParam(SOLVER_ID) String solverId, String payload) {
-
+        logger.debug("About to create solver {} on container {}", solverId, containerId );
+        System.out.println(" >>>>>>>>>>>>>>>>>>\n\n      ABout to create solver "+solverId+" on container "+containerId+" \n\n\n\n");
         Variant v = getVariant( headers );
         try {
             String contentType = getContentType( headers );
@@ -82,6 +85,7 @@ public class SolverResource {
     }
 
     @GET
+    @Path( RestURI.SOLVER_ID_URI )
     @Produces({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
     public Response getSolverState(@javax.ws.rs.core.Context HttpHeaders headers, @PathParam( CONTAINER_ID ) String containerId,
                                     @PathParam( SOLVER_ID ) String solverId ) {
@@ -99,7 +103,7 @@ public class SolverResource {
     }
 
     @GET
-    @Path( SOLVER_BEST_SOLUTION )
+    @Path( SOLVER_ID_URI+SOLVER_BEST_SOLUTION )
     @Produces({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
     public Response getBestSolution(@javax.ws.rs.core.Context HttpHeaders headers, @PathParam( CONTAINER_ID ) String containerId,
                                     @PathParam( SOLVER_ID ) String solverId ) {
@@ -118,6 +122,7 @@ public class SolverResource {
     }
 
     @POST
+    @Path( RestURI.SOLVER_ID_URI )
     @Consumes({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
     @Produces({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
     public Response updateSolverState(
@@ -140,6 +145,7 @@ public class SolverResource {
     }
 
     @DELETE
+    @Path( RestURI.SOLVER_ID_URI )
     @Produces({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
     public Response disposeSolver(@javax.ws.rs.core.Context HttpHeaders headers, @PathParam( CONTAINER_ID ) String containerId,
                                   @PathParam( SOLVER_ID ) String solverId ) {

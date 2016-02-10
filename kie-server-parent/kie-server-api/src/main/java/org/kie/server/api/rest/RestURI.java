@@ -175,8 +175,8 @@ public class RestURI {
     public static final String RUN_FILTERED_QUERY_DEF_POST_URI = "{" + QUERY_NAME + "}/filtered-data";
 
     // optaplanner URI
-    public static final String SOLVER_URI = "/optaplanner/containers/{" + CONTAINER_ID + "}/solvers";
-    public static final String SOLVER_ID_URI = SOLVER_URI + "/{" + SOLVER_ID + "}";
+    public static final String SOLVER_URI = "/containers/{" + CONTAINER_ID + "}/solvers";
+    public static final String SOLVER_ID_URI = "/{" + SOLVER_ID + "}";
     public static final String SOLVER_BEST_SOLUTION = "/bestsolution";
 
     public static String build(String baseUrl, String template, Map<String, Object> parameters) {
