@@ -2,7 +2,7 @@
 <solver>
   <!-- Domain model configuration -->
   <solutionClass>org.kie.server.testing.CloudBalance</solutionClass>
-  <planningEntityClass>org.kie.server.testing.CloudProcess</planningEntityClass>
+  <entityClass>org.kie.server.testing.CloudProcess</entityClass>
 
   <!-- Score configuration -->
   <scoreDirectorFactory>
