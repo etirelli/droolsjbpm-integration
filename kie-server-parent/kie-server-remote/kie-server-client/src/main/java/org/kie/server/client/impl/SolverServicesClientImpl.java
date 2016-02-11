@@ -101,7 +101,7 @@ public class SolverServicesClientImpl
     }
 
     private String getURI(String containerId, String solverId) {
-        return (baseURI + RestURI.SOLVER_URI + RestURI.SOLVER_ID_URI).replace( "{"+RestURI.CONTAINER_ID+"}", containerId ).replace( "{"+RestURI.SOLVER_ID+"}", solverId );
+        return (baseURI + "/" + RestURI.SOLVER_URI + RestURI.SOLVER_ID_URI).replace( "{"+RestURI.CONTAINER_ID+"}", containerId ).replace( "{"+RestURI.SOLVER_ID+"}", solverId );
     }
 
 }
