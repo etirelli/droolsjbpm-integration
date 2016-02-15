@@ -80,6 +80,7 @@ import org.kie.server.api.model.type.JaxbList;
 import org.kie.server.api.model.type.JaxbMap;
 import org.optaplanner.core.api.domain.solution.Solution;
 import org.optaplanner.core.api.score.Score;
+import org.optaplanner.core.api.score.buildin.hardsoft.HardSoftScore;
 
 public class JaxbMarshaller implements Marshaller {
     public static final Class<?>[] KIE_SERVER_JAXB_CLASSES;
@@ -177,7 +178,8 @@ public class JaxbMarshaller implements Marshaller {
                 ArrayList.class,
 
                 // optaplanner
-                SolverInstance.class
+                SolverInstance.class,
+                HardSoftScore.class// is this the only *Score that shall be added to jaxb???
         };
     }
 
