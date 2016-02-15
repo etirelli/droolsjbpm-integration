@@ -90,7 +90,7 @@ public class SolverResource {
         Variant v = getVariant( headers );
         try {
             String contentType = getContentType( headers );
-            SolverInstance solverInstance = marshallerHelper.unmarshal( payload, contentType, SolverInstance.class );
+            SolverInstance solverInstance = marshallerHelper.unmarshal( containerId, payload, contentType, SolverInstance.class );
             ServiceResponse<SolverInstance> response = solverService.createSolver( containerId, solverId, solverInstance );
             if ( response.getType() == ServiceResponse.ResponseType.SUCCESS ) {
                 return createCorrectVariant( response, headers, Response.Status.CREATED );
