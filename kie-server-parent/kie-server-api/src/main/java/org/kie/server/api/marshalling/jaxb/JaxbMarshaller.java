@@ -80,7 +80,19 @@ import org.kie.server.api.model.type.JaxbList;
 import org.kie.server.api.model.type.JaxbMap;
 import org.optaplanner.core.api.domain.solution.Solution;
 import org.optaplanner.core.api.score.Score;
+import org.optaplanner.core.api.score.buildin.bendable.BendableScore;
+import org.optaplanner.core.api.score.buildin.bendablebigdecimal.BendableBigDecimalScore;
+import org.optaplanner.core.api.score.buildin.bendablelong.BendableLongScore;
+import org.optaplanner.core.api.score.buildin.hardmediumsoft.HardMediumSoftScore;
+import org.optaplanner.core.api.score.buildin.hardmediumsoftlong.HardMediumSoftLongScore;
 import org.optaplanner.core.api.score.buildin.hardsoft.HardSoftScore;
+import org.optaplanner.core.api.score.buildin.hardsoftbigdecimal.HardSoftBigDecimalScore;
+import org.optaplanner.core.api.score.buildin.hardsoftdouble.HardSoftDoubleScore;
+import org.optaplanner.core.api.score.buildin.hardsoftlong.HardSoftLongScore;
+import org.optaplanner.core.api.score.buildin.simple.SimpleScore;
+import org.optaplanner.core.api.score.buildin.simplebigdecimal.SimpleBigDecimalScore;
+import org.optaplanner.core.api.score.buildin.simpledouble.SimpleDoubleScore;
+import org.optaplanner.core.api.score.buildin.simplelong.SimpleLongScore;
 
 public class JaxbMarshaller implements Marshaller {
     public static final Class<?>[] KIE_SERVER_JAXB_CLASSES;
@@ -177,9 +189,22 @@ public class JaxbMarshaller implements Marshaller {
 
                 ArrayList.class,
 
-                // optaplanner
+                // OptaPlanner
                 SolverInstance.class,
-                HardSoftScore.class// is this the only *Score that shall be added to jaxb???
+                // TODO We should build and use optaplanner-persistence-jaxb in a future version
+                SimpleScore.class,
+                SimpleLongScore.class,
+                SimpleDoubleScore.class,
+                SimpleBigDecimalScore.class,
+                HardSoftScore.class,
+                HardSoftLongScore.class,
+                HardSoftDoubleScore.class,
+                HardSoftBigDecimalScore.class,
+                HardMediumSoftScore.class,
+                HardMediumSoftLongScore.class,
+                BendableScore.class,
+                BendableLongScore.class,
+                BendableBigDecimalScore.class,
         };
     }
 
