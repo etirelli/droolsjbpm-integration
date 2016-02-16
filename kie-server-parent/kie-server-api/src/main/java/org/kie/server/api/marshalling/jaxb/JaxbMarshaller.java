@@ -179,6 +179,7 @@ public class JaxbMarshaller implements Marshaller {
 
                 // optaplanner
                 SolverInstance.class,
+                SolverInstanceList.class,
                 HardSoftScore.class// is this the only *Score that shall be added to jaxb???
         };
     }
