@@ -50,18 +50,20 @@ public class OptaplannerIntegrationTest
     private static final String CLASS_CLOUD_COMPUTER = "org.kie.server.testing.CloudComputer";
     private static final String CLASS_CLOUD_PROCESS  = "org.kie.server.testing.CloudProcess";
     private static final String CLASS_CLOUD_GENERATOR = "org.kie.server.testing.CloudBalancingGenerator";
-    private KieContainer kieContainer;
+
 
     @BeforeClass
     public static void deployArtifacts() {
         buildAndDeployCommonMavenParent();
         buildAndDeployMavenProject( ClassLoader.class.getResource( "/kjars-sources/cloudbalance" ).getFile() );
+
+        kieContainer = KieServices.Factory.get().newKieContainer(kjar1);
     }
 
     @Override
     protected void addExtraCustomClasses(Map<String, Class<?>> extraClasses)
             throws Exception {
-        kieContainer = KieServices.Factory.get().newKieContainer( kjar1 );
+
         extraClasses.put( CLASS_CLOUD_BALANCE, Class.forName( CLASS_CLOUD_BALANCE, true, kieContainer.getClassLoader() ) );
         extraClasses.put( CLASS_CLOUD_COMPUTER, Class.forName( CLASS_CLOUD_COMPUTER, true, kieContainer.getClassLoader() ) );
         extraClasses.put( CLASS_CLOUD_PROCESS, Class.forName( CLASS_CLOUD_PROCESS, true, kieContainer.getClassLoader() ) );
@@ -91,6 +93,7 @@ public class OptaplannerIntegrationTest
 
     @Test
     public void testCreateSolverWithoutSolverInstance() throws Exception {
+        assertSuccess( client.createContainer( CONTAINER_1_ID, new KieContainerResource( CONTAINER_1_ID, kjar1 ) ) );
         ServiceResponse<SolverInstance> createSolverResponse = solverClient.createSolver(CONTAINER_1_ID, SOLVER_1_ID, null);
 
         ServiceResponse.ResponseType type = createSolverResponse.getType();
@@ -112,6 +115,7 @@ public class OptaplannerIntegrationTest
 
     @Test(expected = IllegalArgumentException.class)
     public void testCreateSolverNullContainer() throws Exception {
+        assertSuccess( client.createContainer( CONTAINER_1_ID, new KieContainerResource( CONTAINER_1_ID, kjar1 ) ) );
         solverClient.createSolver( null, SOLVER_1_ID, null );
     }
 

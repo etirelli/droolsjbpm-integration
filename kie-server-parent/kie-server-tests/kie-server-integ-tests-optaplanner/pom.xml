@@ -222,6 +222,7 @@
           <container>
             <systemProperties>
               <org.jbpm.server.ext.disabled>true</org.jbpm.server.ext.disabled>
+              <org.jbpm.ui.server.ext.disabled>true</org.jbpm.ui.server.ext.disabled>
               <org.drools.server.ext.disabled>${org.drools.server.ext.disabled}</org.drools.server.ext.disabled>
             </systemProperties>
           </container>

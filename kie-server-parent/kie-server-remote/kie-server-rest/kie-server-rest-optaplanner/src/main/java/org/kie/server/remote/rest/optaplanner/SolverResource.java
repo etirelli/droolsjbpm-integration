@@ -90,6 +90,12 @@ public class SolverResource {
         Variant v = getVariant( headers );
         try {
             String contentType = getContentType( headers );
+
+            if (solverService.getKieServerRegistry().getContainer(containerId) == null) {
+                ServiceResponse<SolverInstance> response = new ServiceResponse<SolverInstance>( ServiceResponse.ResponseType.FAILURE, "Failed to create solver. Container does not exist: " + containerId );
+                return createCorrectVariant( response, headers, Response.Status.BAD_REQUEST );
+            }
+
             SolverInstance solverInstance = marshallerHelper.unmarshal( containerId, payload, contentType, SolverInstance.class );
             ServiceResponse<SolverInstance> response = solverService.createSolver( containerId, solverId, solverInstance );
             if ( response.getType() == ServiceResponse.ResponseType.SUCCESS ) {

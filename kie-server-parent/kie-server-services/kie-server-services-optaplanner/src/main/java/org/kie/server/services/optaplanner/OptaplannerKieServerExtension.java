@@ -34,6 +34,7 @@ public class OptaplannerKieServerExtension
 
     public static final String EXTENSION_NAME = "Optaplanner";
 
+    private static final Boolean droolsDisabled = Boolean.parseBoolean(System.getProperty(KieServerConstants.KIE_DROOLS_SERVER_EXT_DISABLED, "false"));
     private static final Boolean disabled = Boolean.parseBoolean( System.getProperty( KieServerConstants.KIE_OPTAPLANNER_SERVER_EXT_DISABLED, "false" ) );
 
     private KieServerRegistry registry;
@@ -52,7 +53,7 @@ public class OptaplannerKieServerExtension
 
     @Override
     public boolean isActive() {
-        return disabled == false;
+        return  disabled == false && droolsDisabled == false;
     }
 
     @Override

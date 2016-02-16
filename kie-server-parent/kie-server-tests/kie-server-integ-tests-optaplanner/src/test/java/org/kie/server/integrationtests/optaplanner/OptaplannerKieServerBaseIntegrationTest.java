@@ -20,6 +20,7 @@ import java.lang.reflect.Field;
 import org.junit.BeforeClass;
 import org.kie.api.KieServices;
 import org.kie.api.command.KieCommands;
+import org.kie.api.runtime.KieContainer;
 import org.kie.server.client.KieServicesClient;
 import org.kie.server.client.RuleServicesClient;
 import org.kie.server.client.SolverServicesClient;
@@ -29,6 +30,7 @@ public abstract class OptaplannerKieServerBaseIntegrationTest
         extends RestJmsSharedBaseIntegrationTest {
 
     protected static KieCommands commandsFactory;
+    protected static KieContainer kieContainer;
 
     protected SolverServicesClient solverClient;
 
