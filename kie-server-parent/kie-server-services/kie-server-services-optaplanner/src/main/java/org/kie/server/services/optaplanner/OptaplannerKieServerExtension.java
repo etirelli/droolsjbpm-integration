@@ -35,6 +35,9 @@ public class OptaplannerKieServerExtension
     public static final String EXTENSION_NAME = "Optaplanner";
 
     private static final Boolean disabled = Boolean.parseBoolean( System.getProperty( KieServerConstants.KIE_OPTAPLANNER_SERVER_EXT_DISABLED, "false" ) );
+    private static final Boolean droolsDisabled = Boolean.parseBoolean( System.getProperty( KieServerConstants.KIE_DROOLS_SERVER_EXT_DISABLED, "false" ) );
+
+    private boolean initialized = false;
 
     private KieServerRegistry registry;
     private SolverServiceBase solverServiceBase;
@@ -52,13 +55,14 @@ public class OptaplannerKieServerExtension
 
     @Override
     public boolean isActive() {
-        return disabled == false;
+        return disabled == false || droolsDisabled == false;
     }
 
     @Override
     public void init(KieServerImpl kieServer, KieServerRegistry registry) {
         KieServerExtension droolsExtension = registry.getServerExtension( "Drools" );
         if ( droolsExtension == null ) {
+            initialized = false;
             logger.warn( "No Drools extension available, quiting..." );
             return;
         }
@@ -72,6 +76,8 @@ public class OptaplannerKieServerExtension
                                                  new ArrayBlockingQueue<Runnable>(Runtime.getRuntime().availableProcessors())); // queue with a size
         this.solverServiceBase = new SolverServiceBase( registry, threadPool );
         this.services.add( solverServiceBase );
+
+        initialized = true;
     }
 
     @Override
@@ -87,15 +93,23 @@ public class OptaplannerKieServerExtension
 
     @Override
     public void disposeContainer(String id, KieContainerInstance kieContainerInstance, Map<String, Object> parameters) {
+        if (!initialized) {
+            return;
+        }
+
         solverServiceBase.disposeSolversForContainer( id, kieContainerInstance );
 
     }
 
     @Override
     public List<Object> getAppComponents(SupportedTransports type) {
+        List<Object> appComponentsList = new ArrayList<Object>();
+        if (!initialized) {
+            return appComponentsList;
+        }
+
         ServiceLoader<KieServerApplicationComponentsService> appComponentsServices
                 = ServiceLoader.load( KieServerApplicationComponentsService.class );
-        List<Object> appComponentsList = new ArrayList<Object>();
         Object[] services = {solverServiceBase, registry};
         for ( KieServerApplicationComponentsService appComponentsService : appComponentsServices ) {
             appComponentsList.addAll( appComponentsService.getAppComponents( EXTENSION_NAME, type, services ) );

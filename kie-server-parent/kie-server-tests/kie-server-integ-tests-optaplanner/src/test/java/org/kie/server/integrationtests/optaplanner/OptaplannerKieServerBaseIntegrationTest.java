@@ -16,13 +16,16 @@
 package org.kie.server.integrationtests.optaplanner;
 
 import java.lang.reflect.Field;
+import java.util.HashSet;
 
 import org.junit.BeforeClass;
 import org.kie.api.KieServices;
 import org.kie.api.command.KieCommands;
 import org.kie.server.client.KieServicesClient;
-import org.kie.server.client.RuleServicesClient;
+import org.kie.server.client.KieServicesConfiguration;
+import org.kie.server.client.KieServicesFactory;
 import org.kie.server.client.SolverServicesClient;
+import org.kie.server.integrationtests.config.TestConfig;
 import org.kie.server.integrationtests.shared.RestJmsSharedBaseIntegrationTest;
 
 public abstract class OptaplannerKieServerBaseIntegrationTest
@@ -41,6 +44,29 @@ public abstract class OptaplannerKieServerBaseIntegrationTest
     @Override
     protected void setupClients(KieServicesClient kieServicesClient) {
         this.solverClient = kieServicesClient.getServicesClient( SolverServicesClient.class );
+    }
+
+    @Override
+    protected KieServicesClient createDefaultClient() throws Exception {
+
+        KieServicesClient kieServicesClient = null;
+        // Add all extra custom classes defined in tests.
+        addExtraCustomClasses(extraClasses);
+        if (TestConfig.isLocalServer()) {
+            KieServicesConfiguration localServerConfig =
+                    KieServicesFactory.newRestConfiguration(TestConfig.getKieServerHttpUrl(), null, null).setMarshallingFormat(marshallingFormat);
+            localServerConfig.addJaxbClasses(new HashSet<Class<?>>(extraClasses.values()));
+            localServerConfig.setTimeout(30000);
+            kieServicesClient =  KieServicesFactory.newKieServicesClient(localServerConfig);
+        } else {
+            configuration.setMarshallingFormat(marshallingFormat);
+            configuration.addJaxbClasses(new HashSet<Class<?>>(extraClasses.values()));
+            configuration.setTimeout(30000);
+            kieServicesClient =  KieServicesFactory.newKieServicesClient(configuration);
+        }
+        setupClients(kieServicesClient);
+
+        return kieServicesClient;
     }
 
     protected Object valueOf(Object object, String fieldName) {
