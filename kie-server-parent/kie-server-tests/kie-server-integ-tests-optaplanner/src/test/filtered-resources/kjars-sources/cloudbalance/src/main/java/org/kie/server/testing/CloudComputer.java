@@ -19,7 +19,7 @@ package org.kie.server.testing;
 import com.thoughtworks.xstream.annotations.XStreamAlias;
 
 @XStreamAlias("CloudComputer")
-public class CloudComputer extends AbstractPersistable implements Labeled {
+public class CloudComputer extends AbstractPersistable {
 
     private int cpuPower; // in gigahertz
     private int memory; // in gigabyte RAM
@@ -64,10 +64,6 @@ public class CloudComputer extends AbstractPersistable implements Labeled {
 
     public int getMultiplicand() {
         return cpuPower * memory * networkBandwidth;
-    }
-
-    public String getLabel() {
-        return "Computer " + id;
     }
 
 }

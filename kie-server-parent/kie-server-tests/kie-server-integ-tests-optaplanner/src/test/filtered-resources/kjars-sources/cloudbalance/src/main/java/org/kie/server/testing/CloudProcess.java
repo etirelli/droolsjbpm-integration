@@ -55,8 +55,7 @@ public class CloudProcess extends AbstractPersistable {
         this.requiredNetworkBandwidth = requiredNetworkBandwidth;
     }
 
-    @PlanningVariable(valueRangeProviderRefs = {"computerRange"},
-            strengthComparatorClass = CloudComputerStrengthComparator.class)
+    @PlanningVariable(valueRangeProviderRefs = {"computerRange"})
     public CloudComputer getComputer() {
         return computer;
     }
