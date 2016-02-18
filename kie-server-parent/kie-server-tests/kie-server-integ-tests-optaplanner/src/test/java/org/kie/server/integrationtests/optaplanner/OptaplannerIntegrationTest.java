@@ -31,9 +31,7 @@ import java.lang.Thread;
 import java.lang.reflect.Method;
 import java.util.Map;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNull;
-
+import static org.junit.Assert.*;
 
 public class OptaplannerIntegrationTest
         extends OptaplannerKieServerBaseIntegrationTest {
@@ -239,6 +237,7 @@ public class OptaplannerIntegrationTest
         instance.setPlanningProblem( loadPlanningProblem( 5, 10 ) );
         try {
             solverClient.updateSolverState( CONTAINER_1_ID, SOLVER_1_ID, instance );
+            fail("A KieServicesException should have been thrown by now.");
         } catch (KieServicesException e) {
             assertResultContainsStringRegex(e.getMessage(), ".*Solver.*not found in container.*");
         }
@@ -290,9 +289,9 @@ public class OptaplannerIntegrationTest
 
             Method method = cbgc.getMethod( "createCloudBalance", int.class, int.class );
             p = (Solution) method.invoke( cbgi, computerListSize, processListSize );
-        } catch ( Exception e ) {
+        } catch ( ReflectiveOperationException e ) {
             e.printStackTrace();
-            org.junit.Assert.fail( "Exception trying to create cloud balance unsolved problem.");
+            fail( "Exception trying to create cloud balance unsolved problem.");
         }
         return p;
     }
