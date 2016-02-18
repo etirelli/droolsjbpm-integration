@@ -160,6 +160,7 @@ public class OptaplannerIntegrationTest
 
         try {
             solverClient.getSolverState(CONTAINER_1_ID, SOLVER_1_ID);
+            fail("A KieServicesException should have been thrown by now.");
         } catch (KieServicesException e) {
             assertResultContainsStringRegex(e.getMessage(), ".*Solver.*not found in container.*");
         }
@@ -222,6 +223,7 @@ public class OptaplannerIntegrationTest
 
         try {
             solverClient.getSolverBestSolution(CONTAINER_1_ID, SOLVER_1_ID);
+            fail("A KieServicesException should have been thrown by now.");
         } catch (KieServicesException e) {
             assertResultContainsStringRegex(e.getMessage(), ".*Solver.*not found in container.*");
         }
