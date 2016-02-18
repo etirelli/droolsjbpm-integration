@@ -297,30 +297,4 @@ public class OptaplannerIntegrationTest
         return p;
     }
 
-    @Test @Ignore("This test is for debugging purposes only. Will remove it once development is done.")
-    public void testMarshalling() {
-        Solution s = loadPlanningProblem( 5, 10);
-        SolverInstance i = new SolverInstance();
-        i.setStatus( SolverInstance.SolverStatus.NOT_SOLVING );
-        i.setPlanningProblem( s );
-        i.setContainerId( "container" );
-        i.setSolverConfigFile( "config.xml" );
-        i.setSolverId( "solver" );
-
-
-        ClassLoader cl = kieContainer.getClassLoader();
-        try {
-            client.setClassLoader( kieContainer.getClassLoader() );
-            String m = ((KieServicesClientImpl)client).marshaller.marshall( i );
-            System.out.println( m );
-
-            SolverInstance u = ( (KieServicesClientImpl) client ).marshaller.unmarshall( m, SolverInstance.class );
-            System.out.println(u);
-        } finally {
-            client.setClassLoader( cl );
-        }
-    }
-
-
-
 }
