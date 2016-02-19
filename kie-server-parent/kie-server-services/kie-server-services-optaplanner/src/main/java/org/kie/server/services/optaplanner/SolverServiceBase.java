@@ -188,7 +188,7 @@ public class SolverServiceBase {
                             startSolver( sic, instance );
                         } else if( instance.getStatus() == SolverInstance.SolverStatus.NOT_SOLVING ) {
                             return new ServiceResponse<SolverInstance>(ServiceResponse.ResponseType.SUCCESS,
-                                                                       "Solver '" + solverId + "' on container '" + containerId + "' is already executing.",
+                                                                       "Solver '" + solverId + "' on container '" + containerId + "' already terminated.",
                                                                        null );
                         }
                     } else if( sic.getInstance().getStatus() == SolverInstance.SolverStatus.SOLVING ){
@@ -196,7 +196,7 @@ public class SolverServiceBase {
                             terminateEarly( sic );
                         } else if( instance.getStatus() == SolverInstance.SolverStatus.SOLVING ) {
                             return new ServiceResponse<SolverInstance>(ServiceResponse.ResponseType.SUCCESS,
-                                                                       "Solver '" + solverId + "' on container '" + containerId + "' already terminated.",
+                                                                       "Solver '" + solverId + "' on container '" + containerId + "' is already executing.",
                                                                        null );
                         }
                     }

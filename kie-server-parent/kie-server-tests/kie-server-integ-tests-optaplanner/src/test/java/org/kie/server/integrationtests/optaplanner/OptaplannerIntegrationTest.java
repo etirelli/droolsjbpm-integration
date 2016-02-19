@@ -194,6 +194,31 @@ public class OptaplannerIntegrationTest
         assertSuccess( solverClient.disposeSolver( CONTAINER_1_ID, SOLVER_1_ID ) );
     }
 
+    @Test @Ignore("Same issue as in testTerminateEarly.")
+    public void testExecuteRunningSolver() throws Exception {
+        SolverInstance instance = new SolverInstance();
+        instance.setSolverConfigFile( SOLVER_1_CONFIG );
+        assertSuccess( client.createContainer( CONTAINER_1_ID, new KieContainerResource( CONTAINER_1_ID, kjar1 ) ) );
+
+        ServiceResponse<SolverInstance> response = solverClient.createSolver( CONTAINER_1_ID, SOLVER_1_ID, instance );
+        assertSuccess( response );
+        assertEquals( SolverInstance.SolverStatus.NOT_SOLVING, response.getResult().getStatus() );
+
+        // start solver
+        instance.setStatus( SolverInstance.SolverStatus.SOLVING );
+        instance.setPlanningProblem( loadPlanningProblem( 50, 300 ) );
+        response = solverClient.updateSolverState( CONTAINER_1_ID, SOLVER_1_ID, instance );
+        assertSuccess( response );
+        assertEquals( SolverInstance.SolverStatus.SOLVING, response.getResult().getStatus() );
+
+        // start solver again
+        response = solverClient.updateSolverState( CONTAINER_1_ID, SOLVER_1_ID, instance );
+        assertSuccess( response );
+        assertResultContainsStringRegex( response.getMsg(), "Solver.*on container.*is already executing." );
+
+        assertSuccess( solverClient.disposeSolver( CONTAINER_1_ID, SOLVER_1_ID ) );
+    }
+
     @Test @Ignore("Ignoring for now. Geoffrey will review why this is failing.")
     public void testGetBestSolution() throws Exception {
         SolverInstance instance = new SolverInstance();
@@ -254,7 +279,9 @@ public class OptaplannerIntegrationTest
 
         instance.setStatus( SolverInstance.SolverStatus.NOT_SOLVING );
         instance.setPlanningProblem( loadPlanningProblem( 50, 300 ) );
-        assertSuccess( solverClient.updateSolverState( CONTAINER_1_ID, SOLVER_1_ID, instance ) );
+        ServiceResponse<SolverInstance> updateSolverState = solverClient.updateSolverState( CONTAINER_1_ID, SOLVER_1_ID, instance );
+        assertSuccess( updateSolverState );
+        assertResultContainsStringRegex(updateSolverState.getMsg(), "Solver.*on container.*already terminated.");
     }
 
     @Test @Ignore("Ignoring for now. Geoffrey will review why this is failing.")
@@ -277,7 +304,7 @@ public class OptaplannerIntegrationTest
         // and then terminate it
         instance.setStatus( SolverInstance.SolverStatus.NOT_SOLVING );
         response = solverClient.updateSolverState( CONTAINER_1_ID, SOLVER_1_ID, instance );
-
+        assertSuccess( response );
         assertEquals( SolverInstance.SolverStatus.TERMINATING_EARLY, response.getResult().getStatus() );
 
         assertSuccess( solverClient.disposeSolver( CONTAINER_1_ID, SOLVER_1_ID ) );
