@@ -23,6 +23,7 @@ import org.kie.server.api.model.KieContainerResource;
 import org.kie.server.api.model.ReleaseId;
 import org.kie.server.api.model.ServiceResponse;
 import org.kie.server.api.model.instance.SolverInstance;
+import org.kie.server.api.model.instance.SolverInstanceList;
 import org.kie.server.client.KieServicesException;
 import org.kie.server.client.impl.KieServicesClientImpl;
 import org.optaplanner.core.api.domain.solution.Solution;
@@ -164,6 +165,30 @@ public class OptaplannerIntegrationTest
         } catch (KieServicesException e) {
             assertResultContainsStringRegex(e.getMessage(), ".*Solver.*not found in container.*");
         }
+    }
+
+    @Test
+    public void testGetSolvers() throws Exception {
+        ServiceResponse<SolverInstanceList> solvers = solverClient.getSolvers(CONTAINER_1_ID);
+        assertSuccess(solvers);
+        assertEquals(0, solvers.getResult().getContainers().size());
+
+        SolverInstance instance = new SolverInstance();
+        instance.setSolverConfigFile( SOLVER_1_CONFIG );
+        assertSuccess( client.createContainer( CONTAINER_1_ID, new KieContainerResource( CONTAINER_1_ID, kjar1 ) ) );
+        assertSuccess( solverClient.createSolver( CONTAINER_1_ID, SOLVER_1_ID, instance ) );
+
+        solvers = solverClient.getSolvers(CONTAINER_1_ID);
+        assertSuccess(solvers);
+        assertEquals(1, solvers.getResult().getContainers().size());
+
+        SolverInstance returnedInstance = solvers.getResult().getContainers().get(0);
+        assertEquals(CONTAINER_1_ID, returnedInstance.getContainerId());
+        assertEquals( SOLVER_1_CONFIG, returnedInstance.getSolverConfigFile() );
+        assertEquals( SOLVER_1_ID, returnedInstance.getSolverId() );
+        assertEquals( SolverInstance.getSolverInstanceKey( CONTAINER_1_ID, SOLVER_1_ID ), returnedInstance.getSolverInstanceKey());
+        assertEquals( SolverInstance.SolverStatus.NOT_SOLVING, returnedInstance.getStatus());
+        assertNull( returnedInstance.getScore() );
     }
 
     @Test
