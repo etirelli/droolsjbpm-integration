@@ -90,6 +90,9 @@ public class SolverServiceBase {
                                                                                                       "' already exists for container '" + containerId + "'." );
                 }
                 SolverInstanceContext sic = new SolverInstanceContext( instance );
+                if (instance.getStatus() == null) {
+                    instance.setStatus(SolverInstance.SolverStatus.NOT_SOLVING);
+                }
 
                 try {
                     SolverFactory<?> solverFactory = SolverFactory.createFromKieContainerXmlResource( ci.getKieContainer(), instance.getSolverConfigFile() );
@@ -142,22 +145,23 @@ public class SolverServiceBase {
         }
     }
 
-    public ServiceResponse<Solution> getBestSolution( String containerId, String solverId ) {
+    public ServiceResponse<SolverInstance> getBestSolution( String containerId, String solverId ) {
         try {
             SolverInstanceContext sic = solvers.get( SolverInstance.getSolverInstanceKey( containerId, solverId ) );
             if( sic != null ) {
-                Solution bestSolution = sic.getSolver().getBestSolution();
-                return new ServiceResponse<Solution>(ServiceResponse.ResponseType.SUCCESS,
+                updateSolverInstance( sic );
+                sic.getInstance().setBestSolution(sic.getSolver().getBestSolution());
+                return new ServiceResponse<SolverInstance>(ServiceResponse.ResponseType.SUCCESS,
                                                            "Best computed solution for '" + solverId + "' successfully retrieved from container '" + containerId + "'",
-                                                           bestSolution );
+                                                            sic.getInstance() );
             } else {
-                return new ServiceResponse<Solution>(ServiceResponse.ResponseType.FAILURE,
+                return new ServiceResponse<SolverInstance>(ServiceResponse.ResponseType.FAILURE,
                                                            "Solver '" + solverId + "' not found in container '" + containerId + "'",
                                                            null );
             }
         } catch (Exception e) {
             logger.error("Error retrieving solver '" + solverId + "' state from container '" + containerId + "'", e);
-            return new ServiceResponse<Solution>(ServiceResponse.ResponseType.FAILURE,
+            return new ServiceResponse<SolverInstance>(ServiceResponse.ResponseType.FAILURE,
                                                        "Error retrieving solver '" + solverId + "' state from container '" + containerId + "'" + e.getMessage(),
                                                        null );
         }
@@ -178,29 +182,38 @@ public class SolverServiceBase {
             SolverInstanceContext sic = solvers.get( SolverInstance.getSolverInstanceKey( containerId, solverId ) );
             if( sic != null ) {
                 synchronized ( sic ) {
-                    if( sic.getInstance().getStatus() == SolverInstance.SolverStatus.NOT_SOLVING ) {
-                        if( instance.getStatus() == SolverInstance.SolverStatus.SOLVING ) {
-                            if( instance.getPlanningProblem() == null ) {
-                                return new ServiceResponse<SolverInstance>(ServiceResponse.ResponseType.FAILURE,
-                                                                           "Planning-problem is a mandatory field when starting the solver.",
-                                                                           instance );
+                    switch (sic.getInstance().getStatus()) {
+                        case NOT_SOLVING:
+                            switch (instance.getStatus()) {
+                                case SOLVING:
+                                    if (instance.getPlanningProblem() == null) {
+                                        return new ServiceResponse<SolverInstance>(ServiceResponse.ResponseType.FAILURE,
+                                                "Planning-problem is a mandatory field when starting the solver.",
+                                                instance);
+                                    }
+                                    startSolver(sic, instance);
+                                    break;
+                                case TERMINATING_EARLY:
+                                case NOT_SOLVING:
+                                    return new ServiceResponse<SolverInstance>(ServiceResponse.ResponseType.SUCCESS,
+                                            "Solver '" + solverId + "' on container '" + containerId + "' already terminated.",
+                                            null);
                             }
-                            startSolver( sic, instance );
-                        } else if( instance.getStatus() == SolverInstance.SolverStatus.NOT_SOLVING ) {
-                            return new ServiceResponse<SolverInstance>(ServiceResponse.ResponseType.SUCCESS,
-                                                                       "Solver '" + solverId + "' on container '" + containerId + "' already terminated.",
-                                                                       null );
-                        }
-                    } else if( sic.getInstance().getStatus() == SolverInstance.SolverStatus.SOLVING ){
-                        if( instance.getStatus() == SolverInstance.SolverStatus.NOT_SOLVING ) {
-                            terminateEarly( sic );
-                        } else if( instance.getStatus() == SolverInstance.SolverStatus.SOLVING ) {
-                            return new ServiceResponse<SolverInstance>(ServiceResponse.ResponseType.SUCCESS,
-                                                                       "Solver '" + solverId + "' on container '" + containerId + "' is already executing.",
-                                                                       null );
-                        }
+                            break;
+                        case SOLVING:
+                            switch (instance.getStatus()) {
+                                case TERMINATING_EARLY:
+                                case NOT_SOLVING:
+                                    terminateEarly(sic);
+                                    break;
+                                case SOLVING:
+                                    // TODO if the planning problem is different, ignoring it is probably not a success.
+                                    return new ServiceResponse<SolverInstance>(ServiceResponse.ResponseType.SUCCESS,
+                                            "Solver '" + solverId + "' on container '" + containerId + "' is already executing.",
+                                            null);
+                            }
+                            break;
                     }
-
                     updateSolverInstance( sic );
                     return new ServiceResponse<SolverInstance>(ServiceResponse.ResponseType.SUCCESS,
                                                                "Solver '" + solverId + "' from container '" + containerId + "' successfully updated.",
@@ -265,7 +278,6 @@ public class SolverServiceBase {
         SolverInstanceContext sic = solvers.remove( SolverInstance.getSolverInstanceKey( containerId, solverId ) );
         if( sic != null ) {
             synchronized ( sic ) {
-                updateSolverStatus( sic );
                 if( sic.getInstance().getStatus() == SolverInstance.SolverStatus.SOLVING ) {
                     terminateEarly( sic );
                 }
@@ -276,7 +288,7 @@ public class SolverServiceBase {
 
     private  void updateSolverInstance(SolverInstanceContext sic) {
         synchronized ( sic ) {
-            updateSolverStatus( sic );
+            // We keep track of the solver status ourselves, so there's no need to call buggy updateSolverStatus( sic );
             Solution bestSolution = sic.getSolver().getBestSolution();
             sic.getInstance().setScore( bestSolution != null ? bestSolution.getScore() : null );
         }
@@ -285,6 +297,8 @@ public class SolverServiceBase {
     private void updateSolverStatus(SolverInstanceContext sic) {
         Solver solver = sic.getSolver();
         if( ! solver.isSolving() ) {
+            // TODO BUGGY because a solver might have been a scheduled to start, but not started yet
+            // (especially immediately after startSolver() call).
             sic.getInstance().setStatus( SolverInstance.SolverStatus.NOT_SOLVING );
         } else {
             if( solver.isTerminateEarly() ) {
@@ -302,7 +316,10 @@ public class SolverServiceBase {
                     @Override
                     public void run() {
                         try {
-                            sic.getSolver().solve( instance.getPlanningProblem() );
+                            // If the executor's queue is full, it's possible that the solver gets canceled before it starts
+                            if (sic.getInstance().getStatus() == SolverInstance.SolverStatus.SOLVING) {
+                                sic.getSolver().solve( instance.getPlanningProblem() );
+                            }
                         } catch( Exception e ) {
                             logger.error( "Exception executing solver '"+sic.getInstance().getSolverId()+"' from container '"+sic.getInstance().getContainerId()+"'. Thread will terminate.", e );
                         } finally {
@@ -315,9 +332,12 @@ public class SolverServiceBase {
     }
 
     private void terminateEarly(SolverInstanceContext sic) {
+        synchronized ( sic ) {
+            if (sic.getInstance().getStatus() == SolverInstance.SolverStatus.SOLVING) {
+                sic.getInstance().setStatus(SolverInstance.SolverStatus.TERMINATING_EARLY);
+            }
+        }
         sic.getSolver().terminateEarly();
     }
-
-
 
 }

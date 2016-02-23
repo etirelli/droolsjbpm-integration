@@ -9,7 +9,7 @@
 
   <artifactId>kie-server-integ-tests-optaplanner</artifactId>
 
-  <name>KIE :: Execution Server :: Tests :: Optaplanner Integration Tests</name>
+  <name>KIE :: Execution Server :: Tests :: OptaPlanner Integration Tests</name>
   <description>KIE Execution Server Integration Tests (REST, JMS) with configuration options to run on different containers.</description>
 
   <dependencies>

@@ -16,14 +16,18 @@
 package org.kie.server.integrationtests.optaplanner;
 
 import java.lang.reflect.Field;
+import java.util.HashSet;
 
 import org.junit.BeforeClass;
 import org.kie.api.KieServices;
 import org.kie.api.command.KieCommands;
 import org.kie.api.runtime.KieContainer;
 import org.kie.server.client.KieServicesClient;
+import org.kie.server.client.KieServicesConfiguration;
+import org.kie.server.client.KieServicesFactory;
 import org.kie.server.client.RuleServicesClient;
 import org.kie.server.client.SolverServicesClient;
+import org.kie.server.integrationtests.config.TestConfig;
 import org.kie.server.integrationtests.shared.RestJmsSharedBaseIntegrationTest;
 
 public abstract class OptaplannerKieServerBaseIntegrationTest
@@ -45,23 +49,27 @@ public abstract class OptaplannerKieServerBaseIntegrationTest
         this.solverClient = kieServicesClient.getServicesClient( SolverServicesClient.class );
     }
 
-    protected Object valueOf(Object object, String fieldName) {
-        try {
-            Field field = object.getClass().getDeclaredField( fieldName );
-            field.setAccessible( true );
-            return field.get( object );
-        } catch ( Exception e ) {
-            return null;
+    @Override // Override to add kieContainer.getClassLoader() and increase timeout, just like jBPM's base overrides it
+    protected KieServicesClient createDefaultClient() throws Exception {
+
+        KieServicesClient kieServicesClient = null;
+        // Add all extra custom classes defined in tests.
+        addExtraCustomClasses(extraClasses);
+        if (TestConfig.isLocalServer()) {
+            KieServicesConfiguration localServerConfig =
+                    KieServicesFactory.newRestConfiguration(TestConfig.getKieServerHttpUrl(), null, null).setMarshallingFormat(marshallingFormat);
+            localServerConfig.addJaxbClasses(new HashSet<Class<?>>(extraClasses.values()));
+            localServerConfig.setTimeout(30000);
+            kieServicesClient =  KieServicesFactory.newKieServicesClient(localServerConfig, kieContainer.getClassLoader());
+        } else {
+            configuration.setMarshallingFormat(marshallingFormat);
+            configuration.addJaxbClasses(new HashSet<Class<?>>(extraClasses.values()));
+            configuration.setTimeout(30000);
+            kieServicesClient =  KieServicesFactory.newKieServicesClient(configuration, kieContainer.getClassLoader());
         }
+        setupClients(kieServicesClient);
+
+        return kieServicesClient;
     }
 
-    protected void setValue(Object object, String fieldName, Object newValue) {
-        try {
-            Field field = object.getClass().getDeclaredField( fieldName );
-            field.setAccessible( true );
-            field.set( object, newValue );
-        } catch ( Exception e ) {
-            throw new RuntimeException( String.format( "Unable to set value to field %s in object %s due " + e.getMessage(), fieldName, object ), e );
-        }
-    }
 }

@@ -32,7 +32,7 @@ public class OptaplannerKieServerExtension
 
     private static final Logger logger = LoggerFactory.getLogger( OptaplannerKieServerExtension.class );
 
-    public static final String EXTENSION_NAME = "Optaplanner";
+    public static final String EXTENSION_NAME = "OptaPlanner";
 
     private static final Boolean droolsDisabled = Boolean.parseBoolean(System.getProperty(KieServerConstants.KIE_DROOLS_SERVER_EXT_DISABLED, "false"));
     private static final Boolean disabled = Boolean.parseBoolean( System.getProperty( KieServerConstants.KIE_OPTAPLANNER_SERVER_EXT_DISABLED, "false" ) );
@@ -66,11 +66,16 @@ public class OptaplannerKieServerExtension
         this.registry = registry;
         // the following threadpool will have a max thread count equal to the number of cores on the machine.
         // if new jobs are submited and all threads are busy, the reject policy will kick in.
+        int poolSize = Runtime.getRuntime().availableProcessors();
+        if (poolSize >= 4) {
+            // Leave 1 processor alone to handle REST/JMS requests and run the OS
+            poolSize--;
+        }
         this.threadPool = new ThreadPoolExecutor(2, // core size
-                                                 Runtime.getRuntime().availableProcessors(), // max size
+                poolSize, // max size
                                                  120, // idle timeout
                                                  TimeUnit.SECONDS,
-                                                 new ArrayBlockingQueue<Runnable>(Runtime.getRuntime().availableProcessors())); // queue with a size
+                                                 new ArrayBlockingQueue<Runnable>(poolSize)); // queue with a size
         this.solverServiceBase = new SolverServiceBase( registry, threadPool );
         this.services.add( solverServiceBase );
     }
@@ -89,7 +94,6 @@ public class OptaplannerKieServerExtension
     @Override
     public void disposeContainer(String id, KieContainerInstance kieContainerInstance, Map<String, Object> parameters) {
         solverServiceBase.disposeSolversForContainer( id, kieContainerInstance );
-
     }
 
     @Override
@@ -114,7 +118,7 @@ public class OptaplannerKieServerExtension
 
     @Override
     public String getImplementedCapability() {
-        return "Optaplanner";
+        return "OptaPlanner";
     }
 
     @Override

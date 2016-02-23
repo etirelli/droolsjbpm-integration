@@ -11,8 +11,8 @@
 
   <artifactId>kie-server-rest-optaplanner</artifactId>
 
-  <name>KIE :: Execution Server :: Remote :: REST :: Optaplanner</name>
-  <description>KIE Optaplanner Execution Server Extension</description>
+  <name>KIE :: Execution Server :: Remote :: REST :: OptaPlanner</name>
+  <description>KIE OptaPlanner Execution Server Extension</description>
 
   <dependencies>
     <dependency>

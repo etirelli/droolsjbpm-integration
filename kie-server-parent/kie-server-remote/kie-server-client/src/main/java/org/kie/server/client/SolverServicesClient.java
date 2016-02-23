@@ -28,7 +28,7 @@ public interface SolverServicesClient {
 
     ServiceResponse<SolverInstance> getSolverState( String containerId, String solverId );
 
-    ServiceResponse<Solution> getSolverBestSolution( String containerId, String solverId );
+    ServiceResponse<SolverInstance> getSolverBestSolution( String containerId, String solverId );
 
     ServiceResponse<SolverInstance> updateSolverState(String containerId, String solverId, SolverInstance instance);
 

@@ -83,12 +83,12 @@ public class SolverServicesClientImpl
     }
 
     @Override
-    public ServiceResponse<Solution> getSolverBestSolution(String containerId, String solverId) {
+    public ServiceResponse<SolverInstance> getSolverBestSolution(String containerId, String solverId) {
         checkMandatoryParameter( "ContainerID", containerId );
         checkMandatoryParameter( "SolverId", solverId );
         if( config.isRest() ) {
             String uri = getURI( containerId, solverId ) + RestURI.SOLVER_BEST_SOLUTION;
-            return makeHttpGetRequestAndCreateServiceResponse( uri, Solution.class );
+            return makeHttpGetRequestAndCreateServiceResponse( uri, SolverInstance.class );
         } else {
             //            CommandScript script = new CommandScript( Collections.singletonList((KieServerCommand) new CallContainerCommand(id, payload)) );
             //            return (ServiceResponse<String>) executeJmsCommand( script ).getResponses().get( 0 );

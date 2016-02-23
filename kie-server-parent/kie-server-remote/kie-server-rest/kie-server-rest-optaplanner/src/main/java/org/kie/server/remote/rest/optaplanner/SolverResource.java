@@ -67,9 +67,9 @@ public class SolverResource {
         try {
             ServiceResponse<SolverInstanceList> result = solverService.getSolvers( containerId );
             if( result.getType() == ServiceResponse.ResponseType.SUCCESS ) {
-                return createCorrectVariant( result, headers, Response.Status.OK );
+                return createCorrectVariant(marshallerHelper, containerId, result, headers, Response.Status.OK );
             }
-            return createCorrectVariant( result, headers, Response.Status.NOT_FOUND );
+            return createCorrectVariant(marshallerHelper, containerId, result, headers, Response.Status.NOT_FOUND );
         }  catch (Exception e) {
             logger.error("Unexpected error retrieving solvers. Message: '{}'", e.getMessage(), e);
             return internalServerError(MessageFormat.format( Messages.UNEXPECTED_ERROR, e.getMessage()), v);
@@ -93,15 +93,15 @@ public class SolverResource {
 
             if (solverService.getKieServerRegistry().getContainer(containerId) == null) {
                 ServiceResponse<SolverInstance> response = new ServiceResponse<SolverInstance>( ServiceResponse.ResponseType.FAILURE, "Failed to create solver. Container does not exist: " + containerId );
-                return createCorrectVariant( response, headers, Response.Status.BAD_REQUEST );
+                return createCorrectVariant(response, headers, Response.Status.BAD_REQUEST );
             }
 
             SolverInstance solverInstance = marshallerHelper.unmarshal( containerId, payload, contentType, SolverInstance.class );
             ServiceResponse<SolverInstance> response = solverService.createSolver( containerId, solverId, solverInstance );
             if ( response.getType() == ServiceResponse.ResponseType.SUCCESS ) {
-                return createCorrectVariant( response, headers, Response.Status.CREATED );
+                return createCorrectVariant(marshallerHelper, containerId, response, headers, Response.Status.CREATED );
             }
-            return createCorrectVariant( response, headers, Response.Status.BAD_REQUEST );
+            return createCorrectVariant(marshallerHelper, containerId, response, headers, Response.Status.BAD_REQUEST );
         } catch ( Exception e ) {
             logger.error( "Unexpected error creating solver '{}' on container '{}': {}", solverId, containerId, e.getMessage(), e );
             return internalServerError( MessageFormat.format( Messages.UNEXPECTED_ERROR, e.getMessage() ), v );
@@ -117,9 +117,9 @@ public class SolverResource {
         try {
             ServiceResponse<SolverInstance> result = solverService.getSolverState( containerId, solverId );
             if( result.getType() == ServiceResponse.ResponseType.SUCCESS ) {
-                return createCorrectVariant( result, headers, Response.Status.OK );
+                return createCorrectVariant(marshallerHelper, containerId, result, headers, Response.Status.OK );
             }
-            return createCorrectVariant( result, headers, Response.Status.NOT_FOUND );
+            return createCorrectVariant(marshallerHelper, containerId, result, headers, Response.Status.NOT_FOUND );
         }  catch (Exception e) {
             logger.error("Unexpected error retrieving solver state {}", e.getMessage(), e);
             return internalServerError(MessageFormat.format( Messages.UNEXPECTED_ERROR, e.getMessage()), v);
@@ -133,11 +133,11 @@ public class SolverResource {
                                     @PathParam( SOLVER_ID ) String solverId ) {
         Variant v = getVariant( headers );
         try {
-            ServiceResponse<Solution> result = solverService.getBestSolution( containerId, solverId );
+            ServiceResponse<SolverInstance> result = solverService.getBestSolution( containerId, solverId );
             if( result.getType() == ServiceResponse.ResponseType.SUCCESS ) {
-                return createCorrectVariant( result, headers, Response.Status.OK );
+                return createCorrectVariant(marshallerHelper, containerId, result, headers, Response.Status.OK );
             }
-            return createCorrectVariant( result, headers, Response.Status.NOT_FOUND );
+            return createCorrectVariant(marshallerHelper, containerId, result, headers, Response.Status.NOT_FOUND );
         }  catch (Exception e) {
             logger.error("Unexpected error during processing {}", e.getMessage(), e);
             return internalServerError(MessageFormat.format( Messages.UNEXPECTED_ERROR, e.getMessage()), v);
@@ -159,9 +159,9 @@ public class SolverResource {
             SolverInstance solverInstance = marshallerHelper.unmarshal( containerId, payload, contentType, SolverInstance.class );
             ServiceResponse<SolverInstance> response = solverService.updateSolverState( containerId, solverId, solverInstance );
             if ( response.getType() == ServiceResponse.ResponseType.SUCCESS ) {
-                return createCorrectVariant( response, headers, Response.Status.OK );
+                return createCorrectVariant(marshallerHelper, containerId, response, headers, Response.Status.OK );
             }
-            return createCorrectVariant( response, headers, Response.Status.BAD_REQUEST );
+            return createCorrectVariant(marshallerHelper, containerId, response, headers, Response.Status.BAD_REQUEST );
         } catch ( Exception e ) {
             logger.error( "Unexpected error during processing {}", e.getMessage(), e );
             return internalServerError( MessageFormat.format( Messages.UNEXPECTED_ERROR, e.getMessage() ), v );
@@ -177,9 +177,9 @@ public class SolverResource {
         try {
             ServiceResponse<Void> result = solverService.disposeSolver( containerId, solverId );
             if( result.getType() == ServiceResponse.ResponseType.SUCCESS ) {
-                return createCorrectVariant( result, headers, Response.Status.OK );
+                return createCorrectVariant(marshallerHelper, containerId, result, headers, Response.Status.OK );
             }
-            return createCorrectVariant( result, headers, Response.Status.NOT_FOUND );
+            return createCorrectVariant(marshallerHelper, containerId, result, headers, Response.Status.NOT_FOUND );
         } catch (Exception e) {
             logger.error("Unexpected error disposing solver {} on container {}. Message: '{}'", solverId, containerId, e.getMessage(), e);
             return internalServerError(MessageFormat.format( Messages.UNEXPECTED_ERROR, e.getMessage()), v);

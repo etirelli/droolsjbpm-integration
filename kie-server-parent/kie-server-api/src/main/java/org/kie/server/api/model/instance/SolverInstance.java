@@ -44,6 +44,11 @@ public class SolverInstance {
     @XmlJavaTypeAdapter(JaxbUnknownAdapter.class)
     private Solution planningProblem;
 
+    @XmlElement(name = "best-solution")
+    @XStreamAlias("best-solution")
+    @XmlJavaTypeAdapter(JaxbUnknownAdapter.class)
+    private Solution bestSolution;
+
     public SolverInstance() {
     }
 
@@ -95,6 +100,14 @@ public class SolverInstance {
         this.planningProblem = planningProblem;
     }
 
+    public Solution getBestSolution() {
+        return bestSolution;
+    }
+
+    public void setBestSolution(Solution bestSolution) {
+        this.bestSolution = bestSolution;
+    }
+
     @Override
     public String toString() {
         return "SolverInstance{" +
@@ -103,7 +116,6 @@ public class SolverInstance {
                ", solverConfigFile='" + solverConfigFile + '\'' +
                ", status=" + status +
                ", score=" + score +
-               ", planningProblem=" + planningProblem +
                '}';
     }
 

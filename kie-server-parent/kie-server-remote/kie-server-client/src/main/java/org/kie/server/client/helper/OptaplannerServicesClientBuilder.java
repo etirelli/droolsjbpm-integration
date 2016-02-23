@@ -29,7 +29,7 @@ public class OptaplannerServicesClientBuilder
 
     @Override
     public String getImplementedCapability() {
-        return "Optaplanner";
+        return "OptaPlanner";
     } // we should consolidate this into a constant in the kie-server-api jar
 
     @Override

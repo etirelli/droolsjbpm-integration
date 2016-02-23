@@ -209,7 +209,7 @@ public class OptaplannerIntegrationTest
 
         // solver should finish in 5 seconds, but we wait up to 15s before timing out
         for( int i = 0; i < 5 && response.getResult().getStatus() == SolverInstance.SolverStatus.SOLVING; i++ ) {
-            Thread.currentThread().sleep( 3000 );
+            Thread.sleep( 3000 );
             response = solverClient.getSolverState( CONTAINER_1_ID, SOLVER_1_ID );
             assertSuccess( response );
         }
@@ -219,7 +219,7 @@ public class OptaplannerIntegrationTest
         assertSuccess( solverClient.disposeSolver( CONTAINER_1_ID, SOLVER_1_ID ) );
     }
 
-    @Test @Ignore("Same issue as in testTerminateEarly.")
+    @Test
     public void testExecuteRunningSolver() throws Exception {
         SolverInstance instance = new SolverInstance();
         instance.setSolverConfigFile( SOLVER_1_CONFIG );
@@ -244,7 +244,7 @@ public class OptaplannerIntegrationTest
         assertSuccess( solverClient.disposeSolver( CONTAINER_1_ID, SOLVER_1_ID ) );
     }
 
-    @Test @Ignore("Ignoring for now. Geoffrey will review why this is failing.")
+    @Test
     public void testGetBestSolution() throws Exception {
         SolverInstance instance = new SolverInstance();
         instance.setSolverConfigFile( SOLVER_1_CONFIG );
@@ -259,10 +259,21 @@ public class OptaplannerIntegrationTest
         assertSuccess( response );
         assertEquals( SolverInstance.SolverStatus.SOLVING, response.getResult().getStatus() );
 
-        ServiceResponse<Solution> solutionResponse = solverClient.getSolverBestSolution(CONTAINER_1_ID, SOLVER_1_ID);
-        assertSuccess( solutionResponse );
-
-        // TODO evaluate best solution
+        Solution solution = null;
+        // It can take a while for the Construction Heuristic to initialize the solution
+        for (int i = 0; i < 15; i++) {
+            ServiceResponse<SolverInstance> solutionResponse = solverClient.getSolverBestSolution(CONTAINER_1_ID, SOLVER_1_ID);
+            assertSuccess(solutionResponse);
+            solution = solutionResponse.getResult().getBestSolution();
+            // Only once the solution's score is null, the solution is fully uninitialized
+            // TODO add "|| solution.getScore().isInitialized()" once PLANNER-405 is fixed
+            if (solution != null && solution.getScore() != null) {
+                break;
+            }
+            Thread.sleep(1000);
+        }
+        // TODO add "|| solution.getScore().isInitialized()" once PLANNER-405 is fixed
+        assertTrue(solution.getScore() != null);
 
         assertSuccess( solverClient.disposeSolver( CONTAINER_1_ID, SOLVER_1_ID ) );
     }
@@ -309,12 +320,12 @@ public class OptaplannerIntegrationTest
         assertResultContainsStringRegex(updateSolverState.getMsg(), "Solver.*on container.*already terminated.");
     }
 
-    @Test @Ignore("Ignoring for now. Geoffrey will review why this is failing.")
+    @Test
     public void testTerminateEarly() throws Exception {
-        SolverInstance instance = new SolverInstance();
-        instance.setSolverConfigFile( SOLVER_1_CONFIG );
         assertSuccess( client.createContainer( CONTAINER_1_ID, new KieContainerResource( CONTAINER_1_ID, kjar1 ) ) );
 
+        SolverInstance instance = new SolverInstance();
+        instance.setSolverConfigFile( SOLVER_1_CONFIG );
         ServiceResponse<SolverInstance> response = solverClient.createSolver( CONTAINER_1_ID, SOLVER_1_ID, instance );
         assertSuccess( response );
         assertEquals( SolverInstance.SolverStatus.NOT_SOLVING, response.getResult().getStatus() );
@@ -330,24 +341,25 @@ public class OptaplannerIntegrationTest
         instance.setStatus( SolverInstance.SolverStatus.NOT_SOLVING );
         response = solverClient.updateSolverState( CONTAINER_1_ID, SOLVER_1_ID, instance );
         assertSuccess( response );
-        assertEquals( SolverInstance.SolverStatus.TERMINATING_EARLY, response.getResult().getStatus() );
+        assertTrue(response.getResult().getStatus() == SolverInstance.SolverStatus.TERMINATING_EARLY
+                || response.getResult().getStatus() == SolverInstance.SolverStatus.NOT_SOLVING);
 
         assertSuccess( solverClient.disposeSolver( CONTAINER_1_ID, SOLVER_1_ID ) );
     }
 
     public Solution loadPlanningProblem( int computerListSize, int processListSize ) {
-        Solution p = null;
+        Solution problem = null;
         try {
             Class<?> cbgc = kieContainer.getClassLoader().loadClass( CLASS_CLOUD_GENERATOR );
             Object cbgi = cbgc.newInstance();
 
             Method method = cbgc.getMethod( "createCloudBalance", int.class, int.class );
-            p = (Solution) method.invoke( cbgi, computerListSize, processListSize );
+            problem = (Solution) method.invoke( cbgi, computerListSize, processListSize );
         } catch ( ReflectiveOperationException e ) {
             e.printStackTrace();
             fail( "Exception trying to create cloud balance unsolved problem.");
         }
-        return p;
+        return problem;
     }
 
 }

@@ -22,7 +22,9 @@ import javax.xml.bind.annotation.XmlAttribute;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlElements;
 import javax.xml.bind.annotation.XmlRootElement;
+import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
 
+import org.drools.core.xml.jaxb.util.JaxbUnknownAdapter;
 import org.kie.server.api.model.definition.AssociatedEntitiesDefinition;
 import org.kie.server.api.model.definition.ProcessDefinition;
 import org.kie.server.api.model.definition.ProcessDefinitionList;
@@ -118,8 +120,7 @@ public class ServiceResponse<T> {
 
             // optaplanner entities
             @XmlElement(name = "solver-instance", type = SolverInstance.class),
-            @XmlElement(name = "solver-instance-list", type = SolverInstanceList.class)//,
-            //@XmlElement(name = "solution", type = Solution.class)
+            @XmlElement(name = "solver-instance-list", type = SolverInstanceList.class)
             })
     private T                            result;
 

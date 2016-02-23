@@ -11,8 +11,8 @@
 
   <artifactId>kie-server-services-optaplanner</artifactId>
 
-  <name>KIE :: Execution Server :: Services :: Optaplanner Extension</name>
-  <description>KIE Optaplanner Execution Server Extension</description>
+  <name>KIE :: Execution Server :: Services :: OptaPlanner Extension</name>
+  <description>KIE OptaPlanner Execution Server Extension</description>
 
 
   <dependencies>
