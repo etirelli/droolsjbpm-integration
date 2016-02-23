@@ -72,4 +72,13 @@ public abstract class OptaplannerKieServerBaseIntegrationTest
         return kieServicesClient;
     }
 
+    protected Object valueOf(Object object, String fieldName) {
+        try {
+            Field field = object.getClass().getDeclaredField( fieldName );
+            field.setAccessible( true );
+            return field.get( object );
+        } catch ( Exception e ) {
+            return null;
+        }
+    }
 }
